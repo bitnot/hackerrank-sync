@@ -1,13 +1,17 @@
-package org.bitnot.hkwget
+package org.bitnot.hkwget.services
 
-import Models._
+
+import scala.util._
+
 import com.softwaremill.sttp._
 import com.softwaremill.sttp.circe._
 import io.circe.generic.auto._
 import io.circe.java8.time._
-import org.bitnot.hkwget.HackeRankAuth.NewRequest
 
-import scala.util._
+import org.bitnot.hkwget.models.hackerrank._
+import org.bitnot.hkwget.helpers._
+import org.bitnot.hkwget.services.HackeRankAuth.NewRequest
+
 
 trait HackerRankService {
 
@@ -18,6 +22,7 @@ trait HackerRankService {
   def getSubmissions
   : Try[Seq[Submission]] //todo: maybe ApiResponse[Submission] ?
 }
+
 
 trait HackeRankAuth {
   def setHeaders(req: NewRequest): NewRequest

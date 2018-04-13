@@ -1,4 +1,4 @@
-package org.bitnot.hkwget
+package org.bitnot.hkwget.helpers
 
 object Urls {
   import com.softwaremill.sttp._

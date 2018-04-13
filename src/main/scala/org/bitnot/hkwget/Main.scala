@@ -1,14 +1,16 @@
 package org.bitnot.hkwget
 
+import org.bitnot.hkwget.models.Profile
+import org.bitnot.hkwget.services.{DummyHackeRankAuth, HackerRankHttpService}
+
 object Main extends App {
 
-  import com.typesafe.config.ConfigFactory
   import io.circe.java8.time._
 
 
-//  val authConf = ConfigFactory.load().getConfig("hkwget.auth")
-//  val login = authConf.getString("login")
-//  val password = authConf.getString("password")
+  //  val authConf = ConfigFactory.load().getConfig("hkwget.auth")
+  //  val login = authConf.getString("login")
+  //  val password = authConf.getString("password")
 
 
   val cookieTxt =
@@ -16,10 +18,15 @@ object Main extends App {
 
   val hkService = new HackerRankHttpService(DummyHackeRankAuth(cookieTxt))
 
-  val submissions = hkService.getSubmissions
+  val maybeSubmissions = hkService.getSubmissions
   //  import io.circe.parser.decode
   //  val json = scala.io.Source.fromResource("submissions.json").getLines.mkString
   //  val submissions = decode[ApiResponse[SubmissionPreview]](json)
-  println(s"#submissions: ${submissions}")
+  println(s"#submissions: ${maybeSubmissions}")
+
+  for (submissions <- maybeSubmissions) {
+    val localProfile = Profile.from(submissions)
+    println(s"#localProfile: ${localProfile}")
+  }
 
 }
