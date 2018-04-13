@@ -85,20 +85,6 @@ class HackerRankHttpService(auth: HackeRankAuth)
   def getLanguages(): Try[LanguagesResponse] =
     get[LanguagesResponse](Urls.languages)
 
-  def getContests(): Try[ApiResponse[Contest]] =
-    get[ApiResponse[Contest]](Urls.contests())
-
-  private def getSubmissionPreviews() =
-    get[ApiResponse[SubmissionPreview]](Urls.submissions(limit = 1000))
-
-  private def takeLatestByChallengeByLang(submissions: Seq[SubmissionPreview]) = {
-    submissions
-      .groupBy(s => (s.challenge, s.language))
-      .map { case ((_, _), submissions) =>
-        submissions.maxBy(_.id)
-      }
-  }
-
   override def getSubmissions(maxSubmissionsToSave: Int = 1000): Try[Seq[Submission]] = {
     logger.info("running getSubmissions")
     for {
@@ -131,6 +117,20 @@ class HackerRankHttpService(auth: HackeRankAuth)
         .toSeq
       submissions
     }
+  }
+
+  def getContests(): Try[ApiResponse[Contest]] =
+    get[ApiResponse[Contest]](Urls.contests())
+
+  private def getSubmissionPreviews() =
+    get[ApiResponse[SubmissionPreview]](Urls.submissions(limit = 1000))
+
+  private def takeLatestByChallengeByLang(submissions: Seq[SubmissionPreview]) = {
+    submissions
+      .groupBy(s => (s.challenge, s.language))
+      .map { case ((_, _), submissions) =>
+        submissions.maxBy(_.id)
+      }
   }
 }
 

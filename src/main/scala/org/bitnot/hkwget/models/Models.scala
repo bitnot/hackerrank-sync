@@ -128,10 +128,9 @@ object CirceConfig {
                                 challenge: ChallengeName,
                                 inserttime: Int
 
-                              )
-{
-  def accepted:Boolean = status == "Accepted"
-}
+                              ) {
+    def accepted: Boolean = status == "Accepted"
+  }
 
   case class Submission(
                          id: Int,
@@ -188,7 +187,7 @@ object CirceConfig {
                          next_challenge: Challenge,
                          next_challenge_slug: String,
                          random_challenge_slug: String
-                       ){
+                       ) {
     def accepted: Boolean = status == "Accepted"
   }
 

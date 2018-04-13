@@ -1,6 +1,7 @@
 package org.bitnot.hkwget.models
 
 import org.bitnot.hkwget.models.local.Submission
+import org.bitnot.hkwget.models.hackerrank.{Submission => OnlineSubmission}
 
 
 package object local {
@@ -11,6 +12,12 @@ package object local {
 
   case class Language(name: String,
                       fileExtension: String)
+
+  case class Submission(id: Long,
+                        slug: String,
+                        sourceCode: String,
+                        language: Language
+                       )
 
   object Language {
     // todo: make dynamic
@@ -76,18 +83,10 @@ package object local {
       "xquery" -> "xquery"
     )
 
-    def apply(languageCode: String):Language = Language(languageCode, extensions.getOrElse(languageCode, languageCode))
+    def apply(languageCode: String): Language = Language(languageCode, extensions.getOrElse(languageCode, languageCode))
   }
 
-  case class Submission(id: Long,
-                        slug: String,
-                        sourceCode: String,
-                        language: Language
-                       )
-
   object Submission {
-
-    import hackerrank.{Submission => OnlineSubmission}
 
     def apply(onlineSubmission: OnlineSubmission
              ): Submission =
@@ -113,23 +112,21 @@ case class Profile(
 
 object Profile {
 
-  import hackerrank.{Submission => OnlineSubmission}
-
   def from(submissions: Seq[OnlineSubmission]): Profile = {
     def filterAccepted(submissions: Seq[OnlineSubmission]) = {
       submissions
         .filter(_.accepted)
     }
 
-    def filterLatestByLang(submissions: Seq[OnlineSubmission]) = {
+    def filterLatestByChallengeByLang(submissions: Seq[OnlineSubmission]) = {
       submissions
-        .groupBy(s => s.language)
-        .map { case (language, submissions) =>
+        .groupBy(s => (s.challenge_id, s.language))
+        .map { case (_, submissions) =>
           submissions.maxBy(_.id)
         }
     }
 
-    val latestAccepted = filterLatestByLang(filterAccepted(submissions))
+    val latestAccepted = filterLatestByChallengeByLang(filterAccepted(submissions))
     val contests: Seq[Contest] = latestAccepted
       .groupBy(_.contest_slug)
       .map { case (contest_slug, submissions) =>
