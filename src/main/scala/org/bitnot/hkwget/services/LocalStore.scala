@@ -23,10 +23,13 @@ class LocalFileStore(
   import LocalFileStore._
 
   override def save(profile: Profile): Unit = {
+    val tableHeader = "Track | Topic | Score | Challenge" +
+      "\n----- | ----- | ----- | ---------"
     logger.info("saving profile")
     for (contest <- profile.contests) {
+      var index = List.empty[String]
       for (challenge <- contest.challenges) {
-        val challengePath = Paths.get(outputDir, contest.slug, challenge.slug)
+        val challengePath = challengeDirPath(contest, challenge)
 
         logger.debug(s"mkdir -p $challengePath")
         createDir(challengePath)
@@ -37,24 +40,70 @@ class LocalFileStore(
 
         for (submission <- challenge.submissions) {
           try {
-            saveSubmission(contest, submission)
+            saveSubmission(contest, challenge, submission)
           } catch {
             case ex: Throwable =>
               logger.error(s"Failed to save ${submission.id}", ex)
           }
         }
+
+        val relativePath = Paths.get(
+          challenge.track.parent_slug,
+          challenge.track.slug,
+          challenge.slug
+        )
+
+        index = s"${challenge.track.parent_slug}|${challenge.track.slug}|${"%5.0f".format(challenge.score)}|[${challenge.slug}](./$relativePath/)" :: index
       }
 
+      val contestIndexPath = filePathInContestDir(contest, "index.md")
+
+      val indexMd = s"# ${contest.slug}\n\n${tableHeader}\n${index.sorted.mkString("\n")}"
+
+      Files.write(contestIndexPath,
+        indexMd.getBytes(StandardCharsets.UTF_8),
+        StandardOpenOption.CREATE,
+        StandardOpenOption.TRUNCATE_EXISTING)
     }
   }
 
+  private def filePathInContestDir(
+                                    contest: Contest, fileName: String) = Paths.get(
+    outputDir,
+    contest.slug,
+    fileName
+  )
+
+  private def challengeDirPath(
+                                contest: Contest,
+                                challenge: Challenge) = Paths.get(
+    outputDir,
+    contest.slug,
+    challenge.track.parent_slug,
+    challenge.track.slug,
+    challenge.slug
+  )
+
+  private def filePathInChallenge(
+                                   contest: Contest,
+                                   challenge: Challenge,
+                                   fileName: String) = Paths.get(
+    outputDir,
+    contest.slug,
+    challenge.track.parent_slug,
+    challenge.track.slug,
+    challenge.slug,
+    fileName
+  )
+
   private def saveSubmission(contest: Contest,
+                             challenge: Challenge,
                              submission: local.Submission): Unit = {
-    val submissionPath = Paths.get(
-      outputDir,
-      contest.slug,
-      submission.slug,
+    val submissionPath = filePathInChallenge(
+      contest,
+      challenge,
       s"solution.${submission.language.fileExtension}")
+
     if (overrideExisting || !Files.exists(submissionPath)) {
       logger.debug(s"Writing submission: $submissionPath")
       Files.write(submissionPath,
@@ -65,12 +114,7 @@ class LocalFileStore(
   }
 
   private def saveStatement(contest: Contest, challenge: Challenge): Unit = {
-    val statementPath = Paths.get(
-      outputDir,
-      contest.slug,
-      challenge.slug,
-      "statement.pdf"
-    )
+    val statementPath = filePathInChallenge(contest, challenge, "statement.pdf")
 
     logger.debug(s"saving $statementPath")
     val statementUri = Urls.problemStatement(challenge.slug, contest.slug)
@@ -79,8 +123,7 @@ class LocalFileStore(
   }
 
   private def saveTestCases(contest: Contest, challenge: Challenge): Unit = {
-    val testCasesPath =
-      Paths.get(outputDir, contest.slug, challenge.slug, "testcases.zip")
+    val testCasesPath = filePathInChallenge(contest, challenge, "testcases.zip")
 
     logger.debug(s"saving $testCasesPath")
     val testCasesUri = Urls.problemTestCases(challenge.slug, contest.slug)

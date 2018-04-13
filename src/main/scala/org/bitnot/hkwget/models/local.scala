@@ -1,7 +1,7 @@
 package org.bitnot.hkwget.models
 
-import org.bitnot.hkwget.models.local.Submission
 import org.bitnot.hkwget.models.hackerrank.{Submission => OnlineSubmission}
+import org.bitnot.hkwget.models.local.Submission
 
 
 package object local {
@@ -101,8 +101,12 @@ package object local {
 
 case class Challenge(
                       slug: String,
-                      submissions: Seq[Submission]
+                      submissions: Seq[Submission],
+                      track: Track,
+                      score: Double
                     )
+
+case class Track(slug: String, parent_slug: String)
 
 case class Contest(slug: String, challenges: Seq[Challenge])
 
@@ -111,6 +115,7 @@ case class Profile(
                   )
 
 object Profile {
+  val defaultTrack = Track("default", "default")
 
   def from(submissions: Seq[OnlineSubmission]): Profile = {
     def filterAccepted(submissions: Seq[OnlineSubmission]) = {
@@ -133,9 +138,23 @@ object Profile {
         val challenges = submissions
           .groupBy(_.challenge_slug)
           .map { case (challenge_slug, submissions) =>
+
+            val track = submissions
+              .headOption
+              .map(s => Track(s.track.slug, s.track.track_slug))
+              .getOrElse(defaultTrack)
+
+            val score: Double = submissions
+              .headOption
+              .map(s => s.display_score.map(_.toDouble).getOrElse(0.0))
+              .getOrElse(0.0)
+
             Challenge(
               challenge_slug,
-              submissions.map(s => Submission(s)).toSeq)
+              submissions.map(s => Submission(s)).toSeq,
+              track,
+              score
+            )
           }.toSeq
         Contest(contest_slug, challenges)
       }.toSeq

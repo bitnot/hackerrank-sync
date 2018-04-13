@@ -66,7 +66,7 @@ case class BasicHackeRankAuth(login: String, password: String)(
 case class DummyHackeRankAuth(cookies: String) extends HackeRankAuth with LazyLogging {
   def setHeaders(req: NewRequest): NewRequest = {
     val CookieHeader = "Cookie"
-    logger.info(s"Authenticating with cookie")
+    logger.debug(s"Authenticating with cookie")
     req.header(CookieHeader, cookies)
   }
 }
@@ -101,7 +101,8 @@ class HackerRankHttpService(auth: HackeRankAuth)
       val acceptedPreviews = previews.models.filter(_.accepted)
 
       val latestByChallengeByLang = takeLatestByChallengeByLang(acceptedPreviews)
-      val submissions = latestByChallengeByLang
+      val limited = latestByChallengeByLang.take(maxSubmissionsToSave)
+      val submissions = limited
         .map { preview =>
           val maybeSubmission = get[SubmissionResponse](
             Urls.submission(
@@ -141,7 +142,7 @@ object HackerRankHttpService extends LazyLogging {
                        backend: SttpBackend[Id, Nothing],
                        decoder: io.circe.Decoder[T]): Try[T] = {
     import HackeRankAuth._
-    logger.info(s"getting $uri")
+    logger.debug(s"getting $uri")
     val response = sttp
       .authorize()
       .get(uri)

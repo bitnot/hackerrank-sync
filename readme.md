@@ -2,7 +2,7 @@
 
 ## What
 
-Download your submitted solutions from HackerRank to your disk
+Downloads your solutions from HackerRank to your computer.
 
 ## Why 
 
@@ -13,9 +13,23 @@ To keep track of your performance, reflect on old code and improve
 Because "monad is just a monoid in the category of endofunctors, what's the problem?"
 A dynamic language like JavaScript or Python would have been handier for this task, but meh.
 
-## How?
+## How to start
 
-sttp + circe + ... + love
+At the moment authentication is done via logging in into browser and storing cookies to a file.
+You can ignore `login` and `password` settings in `reference.conf`
+Add a `cookies.txt` to `/src/main/resources/` containing the value of `Cookie` header 
+(1 line formatted as `cookie1_name: cookie1_value; cookie2_name: cookie2_value; ...`) 
+after you have logged into website in your browser.
+Example:
+```txt
+default_cdn_url=hrcdn.net; _hrank_session=12ghv3123kh1v2k3ghv1k2h3gv12hg3v12gh3v1; cdn_url=hrcdn.net; cdn_set=true; __utma=74197771.123123.1523563402.1523563402.1523563402.1; __utmc=123123123; ...
+```
+
+Compile project with sbt as you usually would and run it.
+Note:
+It is pretty slow right now as all the downloads are synchronous, 
+on the bright side it does not DDOS HackerRank API. 
+So plug in your laptop and go do something useful.
 
 ## TODO
 
