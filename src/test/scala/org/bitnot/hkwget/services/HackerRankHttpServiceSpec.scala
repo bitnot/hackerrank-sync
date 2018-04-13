@@ -32,7 +32,7 @@ class HackerRankHttpServiceSpec
       .whenRequestMatches(
       _.uri.path.startsWith(List("rest", "contests", "master", "submissions")))
       .thenRespond(previews)
-      // https://www.hackerrank.com/rest/contests/master/challenges/2d-array/submissions/14419845
+      // https://www.hackerrank.com/rest/contests/master/challenges/2d-array/submissions/123
       .whenRequestMatches(
       _.uri.path.startsWith(List("rest", "contests", "master", "challenges")))
       .thenRespond(singleSubmission)
@@ -41,7 +41,7 @@ class HackerRankHttpServiceSpec
   implicit val auth = new HackeRankAuth {
     override def setHeaders(req: NewRequest): NewRequest = req
   }
-  val service = new HackerRankHttpService(auth)
+  val service = new HackerRankHttpService
 
   "getLanguages" should "return 63 languages" in {
     val resp = service.getLanguages()
@@ -60,7 +60,7 @@ class HackerRankHttpServiceSpec
   "getSubmissions" should "return 7 accepted answers" in {
     val resp = service.getSubmissions()
     resp.isSuccess shouldEqual true
-    resp.get.size shouldEqual 7 //there is 7 "Accepted" in submissions.json
+    resp.get.size shouldEqual 7 // there is 7 "Accepted" in submissions.json
     resp.get.head.id shouldEqual 14419845
   }
 }

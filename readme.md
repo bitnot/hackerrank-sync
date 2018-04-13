@@ -6,29 +6,34 @@ Downloads your solutions from HackerRank to your computer.
 
 ## Why 
 
-To keep track of your performance, reflect on old code and improve
+To keep track of your performance, reflect on old code and improve.
 
 ## Why Scala
 
-Because "monad is just a monoid in the category of endofunctors, what's the problem?"
-A dynamic language like JavaScript or Python would have been handier for this task, but meh.
+A dynamic language like JavaScript or Python could have been handier for this task, but why not?
 
-## How to start
+
+## How to use
 
 At the moment authentication is done via logging in into browser and storing cookies to a file.
-You can ignore `login` and `password` settings in `reference.conf`
+You can ignore `login` and `password` settings in `reference.conf`.
+
 Add a `cookies.txt` to `/src/main/resources/` containing the value of `Cookie` header 
 (1 line formatted as `cookie1_name: cookie1_value; cookie2_name: cookie2_value; ...`) 
 after you have logged into website in your browser.
+
 Example:
 ```txt
 default_cdn_url=hrcdn.net; _hrank_session=12ghv3123kh1v2k3ghv1k2h3gv12hg3v12gh3v1; cdn_url=hrcdn.net; cdn_set=true; __utma=74197771.123123.1523563402.1523563402.1523563402.1; __utmc=123123123; ...
 ```
 
 Compile project with sbt as you usually would and run it.
+
 Note:
+
 It is pretty slow right now as all the downloads are synchronous, 
 on the bright side it does not DDOS HackerRank API. 
+
 So plug in your laptop and go do something useful.
 
 ## TODO
@@ -39,51 +44,11 @@ So plug in your laptop and go do something useful.
 	Name solution files as `solution.lang` where `lang` is appropriate extension for the language
 	Cookies to be laded from a file
  - [x] - Logging
- - [] - Async (futures? monix? akka?)
  - [x] - Download description and test cases
  - [x] - Filter by status (Accepted/Failed)
  - [x] - Download all solutions in all contests
+ - [] - Async (futures? monix? akka?)
  - [] - Filter by date (solutions since date)
  - [] - Filter by language
  - [] - Request pagination, downloading more than 1k submissions
  - [] - Authentication by username and password (as opposed ot loading cookies from file)
-
-
-## API
-
-List of languages (anonymous):
-http://api.hackerrank.com/checker/languages.json
-
-List of all contests (anonymous):
-https://www.hackerrank.com/rest/contests/upcoming?offset=0&limit=10&contest_slug=active
-
-List of all submissions (authorized):
-https://www.hackerrank.com/rest/contests/master/submissions/?offset=0&limit=1000
-
-Submissions to a problem (authorized):
-https://www.hackerrank.com/rest/contests/master/challenges/2d-array/submissions/?offset=0&limit=10
-
-Code for a particular submission (authorized):
-https://www.hackerrank.com/rest/contests/master/challenges/2d-array/submissions/14419845
-
-Statement and test cases (anonymous):
-https://www.hackerrank.com/rest/contests/master/challenges/2d-array/download_pdf?language=English
-https://www.hackerrank.com/rest/contests/master/challenges/2d-array/download_testcases
-
-
-## Plan 
-
-Cache language codes
--> Get all submissions (limit 1000)
--> Filter by contest id 1 (master) 
--> Filter by status 2 (Accepted)
--> each 
-   -> if submission not saved yet
-   -> get `/rest/contests/master/challenges/${challenge_slug}/submissions/${submission_id}`
-   -> save json
-   -> parse json
-   -> create directories
-   -> write code to file
-   -> get problem.pdf
-   -> get testcases.zip
-   -> unpack test cases

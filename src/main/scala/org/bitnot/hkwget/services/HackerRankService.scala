@@ -21,7 +21,7 @@ trait HackerRankService {
 
   def getSubmissions(maxSubmissionsToSave: Int = 1000): Try[Seq[Submission]]
 
-  //todo: maybe ApiResponse[Submission] ?
+  // todo: maybe ApiResponse[Submission] ?
 }
 
 
@@ -30,10 +30,7 @@ trait HackeRankAuth {
 }
 
 object HackeRankAuth {
-
   type NewRequest = RequestT[Empty, String, Nothing]
-
-  //val NewRequest = RequestT[Empty, String, Nothing]
 
   implicit class Authorizer(req: NewRequest)(implicit auth: HackeRankAuth) {
     def authorize(): NewRequest = auth.setHeaders(req)
@@ -45,8 +42,7 @@ case class BasicHackeRankAuth(login: String, password: String)(
   implicit backend: SttpBackend[Id, Nothing]
 ) extends HackeRankAuth with LazyLogging {
 
-  def setHeaders(
-                  req: NewRequest): NewRequest = {
+  def setHeaders(req: NewRequest): NewRequest = {
 
     logger.debug(s"Authenticating $login")
     val loginResponse =
@@ -72,15 +68,13 @@ case class DummyHackeRankAuth(cookies: String) extends HackeRankAuth with LazyLo
 }
 
 
-class HackerRankHttpService(auth: HackeRankAuth)
-                           (implicit
+class HackerRankHttpService(implicit
+                            auth: HackeRankAuth,
                             backend: SttpBackend[Id, Nothing] = HttpURLConnectionBackend()
                            )
   extends HackerRankService with LazyLogging {
 
   import HackerRankHttpService.get
-
-  implicit private val authorizer = auth
 
   def getLanguages(): Try[LanguagesResponse] =
     get[LanguagesResponse](Urls.languages)
