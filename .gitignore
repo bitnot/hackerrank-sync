@@ -5,3 +5,4 @@ target
 application.conf
 
 *.json
+src/main/resources/cookies.txt
