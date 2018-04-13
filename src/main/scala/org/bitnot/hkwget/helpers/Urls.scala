@@ -1,11 +1,12 @@
 package org.bitnot.hkwget.helpers
 
 object Urls {
+
   import com.softwaremill.sttp._
 
   /**
     * Endpoint accepting POST for authentication
-    * */
+    **/
   def login: Uri = uri"https://www.hackerrank.com/auth/login"
 
   /**
@@ -26,6 +27,17 @@ object Urls {
                          offset: Int = 0,
                          limit: Int = 1000) =
     uri"https://www.hackerrank.com/rest/contests/$contest/challenges/$challenge/submissions/?offset=$offset&limit=$limit"
+
+
+  def problemStatement(challenge: String,
+                       contest: String = "master") =
+    uri"https://www.hackerrank.com/rest/contests/${contest}/challenges/${challenge}/download_pdf?language=English"
+
+
+  def problemTestCases(challenge: String,
+                       contest: String = "master") =
+    uri"https://www.hackerrank.com/rest/contests/${contest}/challenges/${challenge}/download_testcases"
+
 
   /**
     * List of submissions:

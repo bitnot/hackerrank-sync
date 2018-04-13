@@ -105,7 +105,7 @@ case class Challenge(
                       submissions: Seq[Submission]
                     )
 
-case class Contest(name: String, challenges: Seq[Challenge])
+case class Contest(slug: String, challenges: Seq[Challenge])
 
 case class Profile(
                     contests: Seq[Contest]
