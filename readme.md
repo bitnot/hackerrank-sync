@@ -19,16 +19,16 @@ sttp + circe + ... + love
 
 ## TODO
 
- - [] - Download all (up to 1k) solutions in 'master' and arrange into folders by slug
+ - [x] - Download all (up to 1k) solutions in 'master' and arrange into folders by slug
 	In case there are multiple submissions in the same language, take the lates
 	In case there are multiple submissions in different languages, take the latest of each
 	Name solution files as `solution.lang` where `lang` is appropriate extension for the language
 	Cookies to be laded from a file
- - [] - Logging
+ - [x] - Logging
  - [] - Async (futures? monix? akka?)
- - [] - Download description and test cases
- - [] - Filter by status (Accepted/Failed)
- - [] - Download all solutions in all contests
+ - [x] - Download description and test cases
+ - [x] - Filter by status (Accepted/Failed)
+ - [x] - Download all solutions in all contests
  - [] - Filter by date (solutions since date)
  - [] - Filter by language
  - [] - Request pagination, downloading more than 1k submissions
@@ -50,7 +50,7 @@ Submissions to a problem (authorized):
 https://www.hackerrank.com/rest/contests/master/challenges/2d-array/submissions/?offset=0&limit=10
 
 Code for a particular submission (authorized):
-https://www.hackerrank.com/rest/contests/master/challenges/2d-array/submissions/70419836
+https://www.hackerrank.com/rest/contests/master/challenges/2d-array/submissions/14419845
 
 Statement and test cases (anonymous):
 https://www.hackerrank.com/rest/contests/master/challenges/2d-array/download_pdf?language=English

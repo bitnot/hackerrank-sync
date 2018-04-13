@@ -19,7 +19,8 @@ trait HackerRankService {
 
   def getContests: Try[ApiResponse[Contest]]
 
-  def getSubmissions: Try[Seq[Submission]]
+  def getSubmissions(maxSubmissionsToSave: Int = 1000): Try[Seq[Submission]]
+
   //todo: maybe ApiResponse[Submission] ?
 }
 
@@ -70,7 +71,12 @@ case class DummyHackeRankAuth(cookies: String) extends HackeRankAuth with LazyLo
   }
 }
 
-class HackerRankHttpService(auth: HackeRankAuth) extends HackerRankService with LazyLogging {
+
+class HackerRankHttpService(auth: HackeRankAuth)
+                           (implicit
+                            backend: SttpBackend[Id, Nothing] = HttpURLConnectionBackend()
+                           )
+  extends HackerRankService with LazyLogging {
 
   import HackerRankHttpService.get
 
@@ -83,9 +89,17 @@ class HackerRankHttpService(auth: HackeRankAuth) extends HackerRankService with 
     get[ApiResponse[Contest]](Urls.contests())
 
   private def getSubmissionPreviews() =
-    get[ApiResponse[SubmissionPreview]](Urls.submissions(limit = 10))
+    get[ApiResponse[SubmissionPreview]](Urls.submissions(limit = 1000))
 
-  override def getSubmissions: Try[Seq[Submission]] = {
+  private def takeLatestByChallengeByLang(submissions: Seq[SubmissionPreview]) = {
+    submissions
+      .groupBy(s => (s.challenge, s.language))
+      .map { case ((_, _), submissions) =>
+        submissions.maxBy(_.id)
+      }
+  }
+
+  override def getSubmissions(maxSubmissionsToSave: Int = 1000): Try[Seq[Submission]] = {
     logger.info("running getSubmissions")
     for {
       previews: ApiResponse[SubmissionPreview] <- getSubmissionPreviews()
@@ -98,31 +112,33 @@ class HackerRankHttpService(auth: HackeRankAuth) extends HackerRankService with 
       logger.debug(s"contestsMap ${contestsMap.size}")
       logger.debug(s"previews ${previews.total}")
 
-      val submissions =
-        previews.models
-          .take(10)
-          .map { preview =>
-            val maybeSubmission = get[SubmissionResponse](
-              Urls.submission(
-                preview.id,
-                preview.challenge.slug,
-                contest = contestsMap.getOrElse(preview.contest_id, "master")
-              ))
-            maybeSubmission
-              .map(_.model)
-              .toOption
-          }
-          .flatten
+      val acceptedPreviews = previews.models.filter(_.accepted)
+
+      val latestByChallengeByLang = takeLatestByChallengeByLang(acceptedPreviews)
+      val submissions = latestByChallengeByLang
+        .map { preview =>
+          val maybeSubmission = get[SubmissionResponse](
+            Urls.submission(
+              preview.id,
+              preview.challenge.slug,
+              contest = contestsMap.getOrElse(preview.contest_id, "master")
+            ))
+          maybeSubmission
+            .map(_.model)
+            .toOption
+        }
+        .flatten
+        .toSeq
       submissions
     }
   }
 }
 
-object HackerRankHttpService extends LazyLogging {
-  implicit val backend: SttpBackend[Id, Nothing] = HttpURLConnectionBackend()
 
+object HackerRankHttpService extends LazyLogging {
   def get[T](uri: Uri)(implicit
                        auth: HackeRankAuth,
+                       backend: SttpBackend[Id, Nothing],
                        decoder: io.circe.Decoder[T]): Try[T] = {
     import HackeRankAuth._
     logger.info(s"getting $uri")
@@ -145,6 +161,6 @@ object HackerRankHttpService extends LazyLogging {
         logger.debug(s)
         Failure(new Exception(s))
     }
-
   }
+
 }

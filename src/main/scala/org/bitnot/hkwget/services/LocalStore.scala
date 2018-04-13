@@ -11,7 +11,9 @@ trait LocalStore {
   def save(profile: Profile)
 }
 
-class LocalFileStore(outputDir: String, overrideExisting: Boolean = false)
+class LocalFileStore(
+                      outputDir: String,
+                      overrideExisting: Boolean = false)
   extends LocalStore
     with LazyLogging {
 
@@ -113,32 +115,31 @@ object LocalFileStore extends LazyLogging {
 
   private def downloadFileFromUrl(fromUrl: URI, toFilePath: Path): Unit = {
     blocking {
-      var rbcObj: ReadableByteChannel = null
-      var fileOutputStream: FileOutputStream = null
-      // Checking If The File Exists At The Specified Location Or Not
+      // Welcome to Java...
       if (Files.exists(toFilePath)) {
         logger.debug(s"File already exists: $toFilePath")
-      } else
+      } else {
+        var rbcObj: ReadableByteChannel = null
+        var fileOutputStream: FileOutputStream = null
         try {
           Files.createFile(toFilePath)
           rbcObj = Channels.newChannel(fromUrl.toURL.openStream)
           fileOutputStream = new FileOutputStream(toFilePath.toString)
           fileOutputStream.getChannel.transferFrom(rbcObj, 0, Long.MaxValue)
-          logger.debug("! File Successfully Downloaded From The Url !")
+          logger.debug(s"File ${toFilePath} downloaded from ${fromUrl}")
         } catch {
-          case ioExObj: IOException =>
+          case ioEx: IOException =>
             logger.error(
-              "Problem Occured While Downloading The File= " + ioExObj.getMessage,
-              ioExObj)
+              s"Problem downloading ${toFilePath} from ${fromUrl}", ioEx)
         } finally try {
-          if (fileOutputStream != null) fileOutputStream.close()
-          if (rbcObj != null) rbcObj.close()
+          Option(fileOutputStream).foreach(_.close())
+          Option(rbcObj).foreach(_.close())
         } catch {
-          case ioExObj: IOException =>
+          case ioEx: IOException =>
             logger.error(
-              "Problem Occured While Closing The Object= " + ioExObj.getMessage,
-              ioExObj)
+              s"Problem closing ${toFilePath}", ioEx)
         }
+      }
     }
   }
 }

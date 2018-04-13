@@ -129,7 +129,9 @@ object CirceConfig {
                                 inserttime: Int
 
                               )
-
+{
+  def accepted:Boolean = status == "Accepted"
+}
 
   case class Submission(
                          id: Int,
