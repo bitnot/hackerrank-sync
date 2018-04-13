@@ -1,0 +1,7 @@
+.idea
+project/target
+target
+
+application.conf
+
+*.json
