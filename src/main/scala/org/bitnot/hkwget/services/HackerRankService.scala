@@ -155,10 +155,10 @@ object HackerRankHttpService extends LazyLogging {
         logger.debug(s"success: ${t.getClass}")
         Success(t)
       case Right(Left(circeError)) =>
-        logger.debug(s"$circeError")
+        logger.error(s"$circeError")
         Failure(circeError)
       case Left(s: String) =>
-        logger.debug(s)
+        logger.error(s)
         Failure(new Exception(s))
     }
   }

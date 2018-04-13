@@ -32,6 +32,7 @@ class LocalFileStore(
         createDir(challengePath)
 
         saveStatement(contest, challenge)
+        // TODO: Check downloadable_test_cases == true
         saveTestCases(contest, challenge)
 
         for (submission <- challenge.submissions) {
@@ -82,7 +83,7 @@ class LocalFileStore(
       Paths.get(outputDir, contest.slug, challenge.slug, "testcases.zip")
 
     logger.debug(s"saving $testCasesPath")
-    val testCasesUri = Urls.problemStatement(challenge.slug, contest.slug)
+    val testCasesUri = Urls.problemTestCases(challenge.slug, contest.slug)
 
     downloadFileFromUrl(testCasesUri.toJavaUri, testCasesPath)
   }

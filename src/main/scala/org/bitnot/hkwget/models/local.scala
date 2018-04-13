@@ -133,7 +133,9 @@ object Profile {
         val challenges = submissions
           .groupBy(_.challenge_slug)
           .map { case (challenge_slug, submissions) =>
-            Challenge(challenge_slug, submissions.map(s => Submission(s)).toSeq)
+            Challenge(
+              challenge_slug,
+              submissions.map(s => Submission(s)).toSeq)
           }.toSeq
         Contest(contest_slug, challenges)
       }.toSeq
