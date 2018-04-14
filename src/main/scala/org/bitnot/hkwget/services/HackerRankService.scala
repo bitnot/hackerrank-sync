@@ -6,6 +6,7 @@ import com.softwaremill.sttp.circe._
 import com.typesafe.scalalogging.LazyLogging
 import io.circe.generic.auto._
 import io.circe.java8.time._
+import org.bitnot.hkwget.helpers.CustomDecoders._
 import org.bitnot.hkwget.helpers._
 import org.bitnot.hkwget.models.hackerrank._
 import org.bitnot.hkwget.services.HackeRankAuth.NewRequest
@@ -17,15 +18,19 @@ trait HackerRankService {
 
   def getLanguages(): Try[LanguagesResponse]
 
+  def getContestParticipations: Try[ApiResponse[ContestParticipation]]
+
   def getContests: Try[ApiResponse[Contest]]
 
-  def getSubmissions(maxSubmissionsToSave: Int = 1000): Try[Seq[Submission]]
+  def getSubmissions(maxSubmissionsPerContestToSave: Int = 1000): Try[Seq[Submission]]
 
   // todo: maybe ApiResponse[Submission] ?
 }
 
 
 trait HackeRankAuth {
+  def login: String
+
   def setHeaders(req: NewRequest): NewRequest
 }
 
@@ -59,7 +64,7 @@ case class BasicHackeRankAuth(login: String, password: String)(
   }
 }
 
-case class DummyHackeRankAuth(cookies: String) extends HackeRankAuth with LazyLogging {
+case class DummyHackeRankAuth(cookies: String, login: String) extends HackeRankAuth with LazyLogging {
   def setHeaders(req: NewRequest): NewRequest = {
     val CookieHeader = "Cookie"
     logger.debug(s"Authenticating with cookie")
@@ -76,49 +81,66 @@ class HackerRankHttpService(implicit
 
   import HackerRankHttpService.get
 
+
   def getLanguages(): Try[LanguagesResponse] =
     get[LanguagesResponse](Urls.languages)
 
-  override def getSubmissions(maxSubmissionsToSave: Int = 1000): Try[Seq[Submission]] = {
+
+  override def getSubmissions(maxSubmissionsPerContestToSave: Int = 1000): Try[Seq[Submission]] = {
     logger.info("running getSubmissions")
-    for {
-      previews: ApiResponse[SubmissionPreview] <- getSubmissionPreviews()
-      if previews.models.nonEmpty
 
-      contests: ApiResponse[Contest] <- getContests()
-    } yield {
+    for {participations <- getContestParticipations} yield {
+      val contestsToCheck: Seq[String] = "master" :: participations
+        .models
+        .filter(_.hacker_rank.isDefined)
+        .map(_.slug)
+        .toList
 
-      val contestsMap = contests.models.map(c => c.id -> c.slug).toMap
-      logger.debug(s"contestsMap ${contestsMap.size}")
-      logger.debug(s"previews ${previews.total}")
-
-      val acceptedPreviews = previews.models.filter(_.accepted)
-
-      val latestByChallengeByLang = takeLatestByChallengeByLang(acceptedPreviews)
-      val limited = latestByChallengeByLang.take(maxSubmissionsToSave)
-      val submissions = limited
-        .map { preview =>
-          val maybeSubmission = get[SubmissionResponse](
-            Urls.submission(
-              preview.id,
-              preview.challenge.slug,
-              contest = contestsMap.getOrElse(preview.contest_id, "master")
-            ))
-          maybeSubmission
-            .map(_.model)
-            .toOption
+      contestsToCheck.map {
+        case contestName: String => getSubmissionPreviews(contestName) match {
+          case Success(previews) if previews.models.nonEmpty => {
+            logger.debug(s"previews ${previews.total}")
+            val acceptedPreviews = previews.models.filter(_.accepted)
+            val latestByChallengeByLang = takeLatestByChallengeByLang(acceptedPreviews)
+            val limited = latestByChallengeByLang.take(maxSubmissionsPerContestToSave) //TODO : maxSubmissionsPerContestToSave total, not per contest
+            val submissions = limited
+              .map { preview =>
+                val maybeSubmission = getSubmission(contestName, preview)
+                maybeSubmission
+                  .map(_.model)
+                  .toOption
+              }
+              .flatten
+              .toSeq
+            submissions
+          }
+          case _ => Seq.empty[Submission]
         }
-        .flatten
-        .toSeq
-      submissions
+      }.flatten
     }
   }
+
+
+  private def getSubmission(contestName: String, preview: SubmissionPreview) = {
+    get[SubmissionResponse](
+      Urls.submission(
+        preview.id,
+        preview.challenge.slug,
+        contest = contestName
+      ))
+  }
+
+  def getContestParticipations: Try[ApiResponse[ContestParticipation]] =
+    get[ApiResponse[ContestParticipation]](Urls.contestParticipation(auth.login))
+
 
   def getContests(): Try[ApiResponse[Contest]] =
     get[ApiResponse[Contest]](Urls.contests())
 
-  private def getSubmissionPreviews() =
-    get[ApiResponse[SubmissionPreview]](Urls.submissions(limit = 1000))
+
+  private def getSubmissionPreviews(contestName: String = "master"): Try[ApiResponse[SubmissionPreview]] =
+    get[ApiResponse[SubmissionPreview]](Urls.submissions(contest = contestName, limit = 1000))
+
 
   private def takeLatestByChallengeByLang(submissions: Seq[SubmissionPreview]) = {
     submissions

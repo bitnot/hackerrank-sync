@@ -47,13 +47,20 @@ class LocalFileStore(
           }
         }
 
-        val relativePath = Paths.get(
-          challenge.track.parent_slug,
-          challenge.track.slug,
-          challenge.slug
+        val relativePath = challenge.track.map { case track =>
+          Paths.get(
+            track.parent_slug,
+            track.slug,
+            challenge.slug
+          )
+        }.getOrElse(
+          Paths.get(
+            challenge.slug
+          )
         )
 
-        index = s"${challenge.track.parent_slug}|${challenge.track.slug}|${"%5.0f".format(challenge.score)}|[${challenge.slug}](./$relativePath/)" :: index
+        val (trackParentSlug, trackSlug) = challenge.track.map(t=> (t.parent_slug, t.slug)).getOrElse(("",""))
+        index = s"${trackParentSlug}|${trackSlug}|${"%5.0f".format(challenge.score)}|[${challenge.slug}](./$relativePath/)" :: index
       }
 
       val contestIndexPath = filePathInContestDir(contest, "index.md")
@@ -76,24 +83,44 @@ class LocalFileStore(
 
   private def challengeDirPath(
                                 contest: Contest,
-                                challenge: Challenge) = Paths.get(
-    outputDir,
-    contest.slug,
-    challenge.track.parent_slug,
-    challenge.track.slug,
-    challenge.slug
-  )
+                                challenge: Challenge) =
+    challenge.track.map { case track =>
+      Paths.get(
+        outputDir,
+        contest.slug,
+        track.parent_slug,
+        track.slug,
+        challenge.slug
+      )
+    }.getOrElse(
+      Paths.get(
+        outputDir,
+        contest.slug,
+        challenge.slug
+      )
+    )
+
 
   private def filePathInChallenge(
                                    contest: Contest,
                                    challenge: Challenge,
-                                   fileName: String) = Paths.get(
-    outputDir,
-    contest.slug,
-    challenge.track.parent_slug,
-    challenge.track.slug,
-    challenge.slug,
-    fileName
+                                   fileName: String) =
+  challenge.track.map{case track =>
+    Paths.get(
+      outputDir,
+      contest.slug,
+      track.parent_slug,
+      track.slug,
+      challenge.slug,
+      fileName
+    )
+  }.getOrElse(
+    Paths.get(
+      outputDir,
+      contest.slug,
+      challenge.slug,
+      fileName
+    )
   )
 
   private def saveSubmission(contest: Contest,

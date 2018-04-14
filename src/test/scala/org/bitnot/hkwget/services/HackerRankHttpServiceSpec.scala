@@ -16,7 +16,6 @@ class HackerRankHttpServiceSpec
     with MockFactory {
   behavior of "HackerRankHttpService"
 
-
   // https://github.com/softwaremill/sttp/blob/3d8b615c89c276ff1c2db349688079a6d9f5405c/docs/testing.rst
   implicit val testingBackend: SttpBackendStub[Id, Nothing] =
     SttpBackendStub.synchronous
@@ -36,10 +35,16 @@ class HackerRankHttpServiceSpec
       .whenRequestMatches(
       _.uri.path.startsWith(List("rest", "contests", "master", "challenges")))
       .thenRespond(singleSubmission)
+      // https://www.hackerrank.com/rest/hackers/${login}/contest_participation?offset=${offset}&limit=${limit}
+      .whenRequestMatches(
+      _.uri.path.startsWith(List("rest", "hackers")))
+      .thenRespond(contestParticipations)
 
 
   implicit val auth = new HackeRankAuth {
     override def setHeaders(req: NewRequest): NewRequest = req
+
+    override def login: String = "hacker1"
   }
   val service = new HackerRankHttpService
 

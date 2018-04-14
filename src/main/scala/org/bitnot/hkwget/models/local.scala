@@ -102,7 +102,7 @@ package object local {
 case class Challenge(
                       slug: String,
                       submissions: Seq[Submission],
-                      track: Track,
+                      track: Option[Track],
                       score: Double
                     )
 
@@ -141,8 +141,8 @@ object Profile {
 
             val track = submissions
               .headOption
-              .map(s => Track(s.track.slug, s.track.track_slug))
-              .getOrElse(defaultTrack)
+              .map(s => s.track.map(t => Track(t.slug, t.track_slug)))
+              .flatten
 
             val score: Double = submissions
               .headOption

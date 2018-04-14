@@ -20,9 +20,9 @@ object Urls {
     uri"https://www.hackerrank.com/rest/contests/$contest/challenges/$challenge/submissions/$id"
 
   /**
-    * Submissions to a problem
+    * Submissions to a challenge
     **/
-  def problemSubmissions(challenge: String,
+  def challengeSubmissions(challenge: String,
                          contest: String = "master",
                          offset: Int = 0,
                          limit: Int = 1000) =
@@ -57,4 +57,8 @@ object Urls {
     * List of languages:
     **/
   def languages = uri"http://api.hackerrank.com/checker/languages.json"
+
+
+  def contestParticipation(login: String, offset: Int = 0, limit: Int = 1000) =
+    uri"https://www.hackerrank.com/rest/hackers/${login}/contest_participation?offset=${offset}&limit=${limit}"
 }

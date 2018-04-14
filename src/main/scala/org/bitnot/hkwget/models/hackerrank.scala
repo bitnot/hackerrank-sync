@@ -1,8 +1,9 @@
 package org.bitnot.hkwget.models
 
+import java.time.ZonedDateTime
+
 package object hackerrank {
 
-  import java.time.ZonedDateTime
 
   /*
 TODO:make use of @ConfiguredJsonCodec
@@ -67,6 +68,17 @@ object CirceConfig {
                      visible: Boolean,
                      additional_details_filled: Boolean)
 
+  case class ContestParticipation(
+                                   contest_id: Int,
+                                   name: String,
+                                   slug: String,
+                                   created_at: ZonedDateTime,
+                                   contest_ended: Boolean,
+                                   total_participants: Option[Int] = None,
+                                   hacker_rank: Option[Int] = None, // could be "--"
+                                   medal: Option[String] = None
+                                 )
+
   case class ApiResponse[T](models: Seq[T], total: Int, page: Option[Int])
 
   case class Track(
@@ -109,7 +121,7 @@ object CirceConfig {
                                 time_ago: String,
                                 in_contest_bounds: Boolean,
                                 status_code: Int,
-                                score: String,
+                                // score: Double, // Double or Double in a String...
                                 // is_preliminary_score: Option[Any],
                                 challenge: ChallengeName,
                                 inserttime: Int
@@ -123,7 +135,7 @@ object CirceConfig {
                          challenge_id: Int,
                          // hacker_id: Int,
                          language: String,
-                         kind: String,
+                         // kind: String,
                          status: String,
                          // language_status: Int,
                          // score_processed: Int,
@@ -141,8 +153,8 @@ object CirceConfig {
                          // codechecker_signal: Seq[Int],
                          // codechecker_time: Seq[Double],
                          // finishtime: Option[Any],
-                         created_at: String,
-                         updated_at: String,
+                         // created_at: String,
+                         // updated_at: String,
                          // is_preliminary_score: Option[Any],
                          // test_weights: Option[Any],
                          // custom_challenge_config: Option[Any],
@@ -159,12 +171,12 @@ object CirceConfig {
                          // created_at_epoch: String,
                          // player_count: Int,
                          // is_editorial_available: Boolean,
-                         display_score: Option[String],
+                         display_score: Option[Double],
                          // free_test_cases: Seq[Any],
                          // codechecker_hash: String,
                          // progress: Int,
                          // progress_states: Int,
-                         track: Track,
+                         track: Option[Track],
                          // is_sample_testcase: Seq[Boolean],
                          // is_additional_testcase: Seq[Boolean],
                          // individual_test_case_score: Seq[Double],
