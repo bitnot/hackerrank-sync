@@ -59,11 +59,13 @@ class LocalFileStore(
           )
         )
 
-        val (trackParentSlug, trackSlug) = challenge.track.map(t=> (t.parent_slug, t.slug)).getOrElse(("",""))
+        val (trackParentSlug, trackSlug) = challenge.track
+          .map(t => (t.parent_slug, t.slug))
+          .getOrElse((" -/- ", " -/- "))
         index = s"${trackParentSlug}|${trackSlug}|${"%5.0f".format(challenge.score)}|[${challenge.slug}](./$relativePath/)" :: index
       }
 
-      val contestIndexPath = filePathInContestDir(contest, "index.md")
+      val contestIndexPath = filePathInContestDir(contest, "readme.md")
 
       val indexMd = s"# ${contest.slug}\n\n${tableHeader}\n${index.sorted.mkString("\n")}"
 
@@ -105,23 +107,23 @@ class LocalFileStore(
                                    contest: Contest,
                                    challenge: Challenge,
                                    fileName: String) =
-  challenge.track.map{case track =>
-    Paths.get(
-      outputDir,
-      contest.slug,
-      track.parent_slug,
-      track.slug,
-      challenge.slug,
-      fileName
+    challenge.track.map { case track =>
+      Paths.get(
+        outputDir,
+        contest.slug,
+        track.parent_slug,
+        track.slug,
+        challenge.slug,
+        fileName
+      )
+    }.getOrElse(
+      Paths.get(
+        outputDir,
+        contest.slug,
+        challenge.slug,
+        fileName
+      )
     )
-  }.getOrElse(
-    Paths.get(
-      outputDir,
-      contest.slug,
-      challenge.slug,
-      fileName
-    )
-  )
 
   private def saveSubmission(contest: Contest,
                              challenge: Challenge,
