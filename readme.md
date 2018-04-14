@@ -2,7 +2,7 @@
 
 ## What
 
-Downloads your solutions from HackerRank to your computer.
+Downloads your solutions from HackerRank to your computer. [Like this.](https://github.com/bitnot/hackerrank-solutions)
 
 ## Why 
 
