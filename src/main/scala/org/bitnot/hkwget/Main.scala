@@ -6,9 +6,11 @@ import com.typesafe.scalalogging.LazyLogging
 import org.bitnot.hkwget.models.Profile
 import org.bitnot.hkwget.services.{DummyHackeRankAuth, HackeRankAuth, HackerRankHttpService, LocalFileStore}
 
+import scala.collection.JavaConverters._
 
 object Main extends App with LazyLogging {
   val config = ConfigFactory.load()
+  val contestBlackList = config.getStringList("hkwget.contestBlackList").asScala
   val outputDir = config.getString("hkwget.outputDir")
   val maxSubmissionsPerContestToSave = config.getInt("hkwget.maxSubmissionsPerContestToSave")
   val login = config.getString("hkwget.auth.login")
@@ -17,7 +19,7 @@ object Main extends App with LazyLogging {
     scala.io.Source.fromResource("cookies.txt").getLines().mkString
   implicit val auth: HackeRankAuth = DummyHackeRankAuth(cookieTxt, login)
   implicit val backend = HttpURLConnectionBackend()
-  val hkService = new HackerRankHttpService
+  val hkService = new HackerRankHttpService(contestBlackList.toSet)
 
   val maybeSubmissions = hkService.getSubmissions(maxSubmissionsPerContestToSave)
   for (submissions <- maybeSubmissions) {

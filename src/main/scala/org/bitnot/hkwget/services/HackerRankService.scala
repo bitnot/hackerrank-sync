@@ -73,7 +73,8 @@ case class DummyHackeRankAuth(cookies: String, login: String) extends HackeRankA
 }
 
 
-class HackerRankHttpService(implicit
+class HackerRankHttpService(contestBlackList: Set[String] = Set.empty)
+                           (implicit
                             auth: HackeRankAuth,
                             backend: SttpBackend[Id, Nothing] = HttpURLConnectionBackend()
                            )
@@ -96,27 +97,29 @@ class HackerRankHttpService(implicit
         .map(_.slug)
         .toList
 
-      contestsToCheck.map {
-        case contestName: String => getSubmissionPreviews(contestName) match {
-          case Success(previews) if previews.models.nonEmpty => {
-            logger.debug(s"previews ${previews.total}")
-            val acceptedPreviews = previews.models.filter(_.accepted)
-            val latestByChallengeByLang = takeLatestByChallengeByLang(acceptedPreviews)
-            val limited = latestByChallengeByLang.take(maxSubmissionsPerContestToSave) //TODO : maxSubmissionsPerContestToSave total, not per contest
-            val submissions = limited
-              .map { preview =>
-                val maybeSubmission = getSubmission(contestName, preview)
-                maybeSubmission
-                  .map(_.model)
-                  .toOption
-              }
-              .flatten
-              .toSeq
-            submissions
+      contestsToCheck
+        .filter(c => !contestBlackList.contains(c))
+        .map {
+          case contestName: String => getSubmissionPreviews(contestName) match {
+            case Success(previews) if previews.models.nonEmpty => {
+              logger.debug(s"previews ${previews.total}")
+              val acceptedPreviews = previews.models.filter(_.accepted)
+              val latestByChallengeByLang = takeLatestByChallengeByLang(acceptedPreviews)
+              val limited = latestByChallengeByLang.take(maxSubmissionsPerContestToSave) //TODO : maxSubmissionsPerContestToSave total, not per contest
+              val submissions = limited
+                .map { preview =>
+                  val maybeSubmission = getSubmission(contestName, preview)
+                  maybeSubmission
+                    .map(_.model)
+                    .toOption
+                }
+                .flatten
+                .toSeq
+              submissions
+            }
+            case _ => Seq.empty[Submission]
           }
-          case _ => Seq.empty[Submission]
-        }
-      }.flatten
+        }.flatten
     }
   }
 
