@@ -22,7 +22,8 @@ trait HackerRankService {
 
   def getContests: Try[ApiResponse[Contest]]
 
-  def getSubmissions(maxSubmissionsPerContestToSave: Int = 1000): Try[Seq[Submission]]
+  def getSubmissions(maxSubmissionsPerContestToSave: Int = 1000,
+                     millisToLookBack: Long = 0): Try[Seq[Submission]]
 
   // todo: maybe ApiResponse[Submission] ?
 }
@@ -87,8 +88,11 @@ class HackerRankHttpService(contestBlackList: Set[String] = Set.empty)
     get[LanguagesResponse](Urls.languages)
 
 
-  override def getSubmissions(maxSubmissionsPerContestToSave: Int = 1000): Try[Seq[Submission]] = {
+  override def getSubmissions(
+                               maxSubmissionsPerContestToSave: Int = 1000,
+                               secondsToLookBack: Long = 0): Try[Seq[Submission]] = {
     logger.info("running getSubmissions")
+    val since = java.time.Instant.now.toEpochMilli / 1000 - secondsToLookBack
 
     for {participations <- getContestParticipations} yield {
       val contestsToCheck: Seq[String] = "master" :: participations
@@ -100,25 +104,28 @@ class HackerRankHttpService(contestBlackList: Set[String] = Set.empty)
       contestsToCheck
         .filter(c => !contestBlackList.contains(c))
         .map {
-          case contestName: String => getSubmissionPreviews(contestName) match {
-            case Success(previews) if previews.models.nonEmpty => {
-              logger.debug(s"previews ${previews.total}")
-              val acceptedPreviews = previews.models.filter(_.accepted)
-              val latestByChallengeByLang = takeLatestByChallengeByLang(acceptedPreviews)
-              val limited = latestByChallengeByLang.take(maxSubmissionsPerContestToSave) //TODO : maxSubmissionsPerContestToSave total, not per contest
-              val submissions = limited
-                .map { preview =>
-                  val maybeSubmission = getSubmission(contestName, preview)
-                  maybeSubmission
-                    .map(_.model)
-                    .toOption
-                }
-                .flatten
-                .toSeq
-              submissions
+          case contestName: String =>
+            getSubmissionPreviews(contestName) match {
+              case Success(previews) if previews.models.nonEmpty => {
+                logger.debug(s"previews ${previews.total}")
+                val acceptedPreviews = previews.models.filter(_.accepted)
+                val latestByChallengeByLang = takeLatestByChallengeByLang(acceptedPreviews)
+                val filteredByDate = latestByChallengeByLang
+                  .filter(p => secondsToLookBack == 0L || p.created_at >= since)
+                val limited = filteredByDate.take(maxSubmissionsPerContestToSave) //TODO : maxSubmissionsPerContestToSave total, not per contest
+                val submissions = limited
+                  .map { preview =>
+                    val maybeSubmission = getSubmission(contestName, preview)
+                    maybeSubmission
+                      .map(_.model)
+                      .toOption
+                  }
+                  .flatten
+                  .toSeq
+                submissions
+              }
+              case _ => Seq.empty[Submission]
             }
-            case _ => Seq.empty[Submission]
-          }
         }.flatten
     }
   }

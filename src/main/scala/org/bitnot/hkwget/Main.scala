@@ -13,6 +13,7 @@ object Main extends App with LazyLogging {
   val contestBlackList = config.getStringList("hkwget.contestBlackList").asScala
   val outputDir = config.getString("hkwget.outputDir")
   val maxSubmissionsPerContestToSave = config.getInt("hkwget.maxSubmissionsPerContestToSave")
+  val secondsToLookBack = config.getLong("hkwget.lookBackDays")  * 24 * 60 * 60
   val login = config.getString("hkwget.auth.login")
   // val password = config.getString("hkwget.auth.password")
   val cookieTxt =
@@ -21,7 +22,7 @@ object Main extends App with LazyLogging {
   implicit val backend = HttpURLConnectionBackend()
   val hkService = new HackerRankHttpService(contestBlackList.toSet)
 
-  val maybeSubmissions = hkService.getSubmissions(maxSubmissionsPerContestToSave)
+  val maybeSubmissions = hkService.getSubmissions(maxSubmissionsPerContestToSave, secondsToLookBack)
   for (submissions <- maybeSubmissions) {
     val localProfile = Profile.from(submissions)
     logger.info(s"saving profile")
