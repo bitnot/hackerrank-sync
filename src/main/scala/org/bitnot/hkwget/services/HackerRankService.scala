@@ -111,7 +111,7 @@ class HackerRankHttpService(contestBlackList: Set[String] = Set.empty)
           case contestName: String =>
             getSubmissionPreviews(contestName) match {
               case Success(previews) if previews.models.nonEmpty => {
-                logger.debug(s"previews ${previews.total}")
+                logger.debug(s"${previews.total} previews  in ${contestName}")
                 val acceptedPreviews = previews.models.filter(_.accepted)
                 val latestByChallengeByLang = takeLatestByChallengeByLang(acceptedPreviews)
                 val filteredByDate =
