@@ -1,6 +1,8 @@
 package org.bitnot.hkwget.services
 
 
+import java.time.Duration
+
 import com.softwaremill.sttp._
 import com.softwaremill.sttp.circe._
 import com.typesafe.scalalogging.LazyLogging
@@ -22,8 +24,8 @@ trait HackerRankService {
 
   def getContests: Try[ApiResponse[Contest]]
 
-  def getSubmissions(maxSubmissionsPerContestToSave: Int = 1000,
-                     millisToLookBack: Long = 0): Try[Seq[Submission]]
+  def getSubmissions(maxSubmissionsPerContestToSave: Int,
+                     timeToLookBack: Duration): Try[Seq[Submission]]
 
   // todo: maybe ApiResponse[Submission] ?
 }
@@ -88,11 +90,13 @@ class HackerRankHttpService(contestBlackList: Set[String] = Set.empty)
     get[LanguagesResponse](Urls.languages)
 
 
-  override def getSubmissions(
-                               maxSubmissionsPerContestToSave: Int = 1000,
-                               secondsToLookBack: Long = 0): Try[Seq[Submission]] = {
+  override def getSubmissions(maxSubmissionsPerContestToSave: Int = 0,
+                              timeToLookBack: Duration = Duration.ZERO): Try[Seq[Submission]] = {
     logger.info("running getSubmissions")
-    val since = java.time.Instant.now.toEpochMilli / 1000 - secondsToLookBack
+    val sinceEver = timeToLookBack.isZero
+    val sinceUnixSeconds =
+      java.time.Instant.now.minus(timeToLookBack).toEpochMilli / 1000
+    val takeAll = maxSubmissionsPerContestToSave == 0
 
     for {participations <- getContestParticipations} yield {
       val contestsToCheck: Seq[String] = "master" :: participations
@@ -110,9 +114,12 @@ class HackerRankHttpService(contestBlackList: Set[String] = Set.empty)
                 logger.debug(s"previews ${previews.total}")
                 val acceptedPreviews = previews.models.filter(_.accepted)
                 val latestByChallengeByLang = takeLatestByChallengeByLang(acceptedPreviews)
-                val filteredByDate = latestByChallengeByLang
-                  .filter(p => secondsToLookBack == 0L || p.created_at >= since)
-                val limited = filteredByDate.take(maxSubmissionsPerContestToSave) //TODO : maxSubmissionsPerContestToSave total, not per contest
+                val filteredByDate =
+                  if (sinceEver) latestByChallengeByLang
+                  else latestByChallengeByLang.filter(_.created_at >= sinceUnixSeconds)
+                val limited =
+                  if (takeAll) filteredByDate
+                  else filteredByDate.take(maxSubmissionsPerContestToSave) //TODO : maxSubmissionsPerContestToSave total, not per contest
                 val submissions = limited
                   .map { preview =>
                     val maybeSubmission = getSubmission(contestName, preview)
@@ -156,7 +163,7 @@ class HackerRankHttpService(contestBlackList: Set[String] = Set.empty)
     submissions
       .groupBy(s => (s.challenge, s.language))
       .map { case ((_, _), submissions) =>
-        submissions.maxBy(_.id)
+        submissions.maxBy(_.created_at)
       }
   }
 }
