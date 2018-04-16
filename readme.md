@@ -47,8 +47,9 @@ So plug in your laptop and go do something useful.
  - [x] - Download description and test cases
  - [x] - Filter by status (Accepted/Failed)
  - [x] - Download all solutions in all contests
- - [] - Async (futures? monix? akka?)
- - [] - Filter by date (solutions since date)
- - [] - Filter by language
- - [] - Request pagination, downloading more than 1k submissions
- - [] - Authentication by username and password (as opposed ot loading cookies from file)
+ - [x] - Filter by date (solutions since date, last x days)
+ - [ ] - Async (futures? monix? akka?)
+ - [ ] - Exclude contests in progress (?)
+ - [ ] - Filter by language
+ - [ ] - Request pagination, downloading more than 1k submissions
+ - [ ] - Authentication by username and password (as opposed ot loading cookies from file)
