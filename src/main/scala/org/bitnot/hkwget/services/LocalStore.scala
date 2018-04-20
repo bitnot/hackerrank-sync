@@ -7,6 +7,8 @@ import com.typesafe.scalalogging.LazyLogging
 import org.bitnot.hkwget.helpers.Urls
 import org.bitnot.hkwget.models.{Challenge, Contest, Profile, local}
 
+import scala.collection.JavaConverters._
+
 trait LocalStore {
   def save(profile: Profile)
 }
@@ -66,8 +68,18 @@ class LocalFileStore(
       }
 
       val contestIndexPath = filePathInContestDir(contest, "readme.md")
+      val existing =
+        if (Files.exists(contestIndexPath)) {
+          val lines = Files.readAllLines(contestIndexPath, StandardCharsets.UTF_8).asScala.toSeq
+          lines.drop(4)
+        } else Seq.empty
 
-      val indexMd = s"# ${contest.slug}\n\n${tableHeader}\n${index.sorted.mkString("\n")}"
+      val merged = (existing ++ index)
+        .groupBy(identity)
+        .map { case (k, dups) => k }
+        .toSeq
+        .sorted
+      val indexMd = s"# ${contest.slug}\n\n${tableHeader}\n${merged.mkString("\n")}"
 
       Files.write(contestIndexPath,
         indexMd.getBytes(StandardCharsets.UTF_8),

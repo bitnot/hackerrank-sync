@@ -48,6 +48,7 @@ So plug in your laptop and go do something useful.
  - [x] - Filter by status (Accepted/Failed)
  - [x] - Download all solutions in all contests
  - [x] - Filter by date (solutions since date, last x days)
+ - [x] - Merge indexes (readme.md files) to allow partial updates (last x days)
  - [ ] - Async (futures? monix? akka?)
  - [ ] - Exclude contests in progress (?)
  - [ ] - Filter by language
