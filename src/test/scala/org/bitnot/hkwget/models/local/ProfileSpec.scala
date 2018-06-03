@@ -35,13 +35,11 @@ class ProfileSpec
     )
   }.toSeq
 
-  println(JsonStubs.contests)
   println(previews)
   println(submissions)
 
-
   "apply" should "aggregated accepted by challenge and language" in {
-    val profile = Profile.from(submissions)
+    val profile = Profile.apply(submissions)
 
     profile.contests.size shouldEqual 1
     profile.contests.head.slug shouldEqual "master"

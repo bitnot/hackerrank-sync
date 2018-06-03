@@ -1,7 +1,8 @@
 package org.bitnot.hkwget.services
 
 import java.net.URI
-import java.nio.file.{Path, StandardOpenOption}
+import java.nio.charset.StandardCharsets
+import java.nio.file.{Files, Paths, StandardOpenOption}
 
 import com.typesafe.scalalogging.LazyLogging
 import org.bitnot.hkwget.helpers.Urls
@@ -13,129 +14,137 @@ trait LocalStore {
   def save(profile: Profile)
 }
 
-class LocalFileStore(
-                      outputDir: String,
-                      overrideExisting: Boolean = false)
-  extends LocalStore
+class LocalFileStore(outputDir: String, overrideExisting: Boolean = false)
+    extends LocalStore
     with LazyLogging {
-
-  import java.nio.charset.StandardCharsets
-  import java.nio.file.{Files, Paths}
-
   import LocalFileStore._
 
+  private final val tableHeader = "Track | Topic | Score | Challenge" +
+    "\n----- | ----- | ----- | ---------"
+
   override def save(profile: Profile): Unit = {
-    val tableHeader = "Track | Topic | Score | Challenge" +
-      "\n----- | ----- | ----- | ---------"
     logger.info("saving profile")
-    for (contest <- profile.contests) {
-      var index = List.empty[String]
-      for (challenge <- contest.challenges) {
-        val challengePath = challengeDirPath(contest, challenge)
+    profile.contests.foreach(saveContest)
+  }
 
-        logger.debug(s"mkdir -p $challengePath")
-        createDir(challengePath)
+  private def saveContest(contest: Contest) = {
+    val saveChallenge: Challenge => Unit = saveChallengeFiles(_, contest)
+    contest.challenges.foreach(saveChallenge)
+    UpdateIndex(contest)
+  }
 
-        saveStatement(contest, challenge)
-        // TODO: Check downloadable_test_cases == true
-        saveTestCases(contest, challenge)
+  private def saveChallengeFiles(challenge: Challenge, contest: Contest) {
+    val challengePath = challengeDirPath(contest, challenge)
 
-        for (submission <- challenge.submissions) {
-          try {
-            saveSubmission(contest, challenge, submission)
-          } catch {
-            case ex: Throwable =>
-              logger.error(s"Failed to save ${submission.id}", ex)
-          }
-        }
+    createDir(challengePath)
 
-        val relativePath = challenge.track.map { case track =>
-          Paths.get(
-            track.parent_slug,
-            track.slug,
-            challenge.slug
-          )
-        }.getOrElse(
+    saveStatement(contest, challenge)
+    // TODO: Check downloadable_test_cases == true
+    saveTestCases(contest, challenge)
+
+    for (submission <- challenge.submissions) {
+      try {
+        saveSubmission(contest, challenge, submission)
+      } catch {
+        case ex: Throwable =>
+          logger.error(s"Failed to save ${submission.id}", ex)
+      }
+    }
+  }
+
+  private def UpdateIndex(contest: Contest) = {
+    val index = contest.challenges.map { challenge =>
+      val relativePath = challenge.track
+        .map(
+          track =>
+            Paths.get(
+              track.parent_slug,
+              track.slug,
+              challenge.slug
+          ))
+        .getOrElse(
           Paths.get(
             challenge.slug
           )
         )
-
-        val (trackParentSlug, trackSlug) = challenge.track
-          .map(t => (t.parent_slug, t.slug))
-          .getOrElse((" -/- ", " -/- "))
-        index = s"${trackParentSlug}|${trackSlug}|${"%5.0f".format(challenge.score)}|[${challenge.slug}](./$relativePath/)" :: index
-      }
-
-      val contestIndexPath = filePathInContestDir(contest, "readme.md")
-      val existing =
-        if (Files.exists(contestIndexPath)) {
-          val lines = Files.readAllLines(contestIndexPath, StandardCharsets.UTF_8).asScala.toSeq
-          lines.drop(4)
-        } else Seq.empty
-
-      val merged = (existing ++ index)
-        .groupBy(identity)
-        .map { case (k, dups) => k }
-        .toSeq
-        .sorted
-      val indexMd = s"# ${contest.slug}\n\n${tableHeader}\n${merged.mkString("\n")}"
-
-      Files.write(contestIndexPath,
-        indexMd.getBytes(StandardCharsets.UTF_8),
-        StandardOpenOption.CREATE,
-        StandardOpenOption.TRUNCATE_EXISTING)
+      val (trackParentSlug, trackSlug) = challenge.track
+        .map(t => (t.parent_slug, t.slug))
+        .getOrElse((" -/- ", " -/- "))
+      val scoreString = "%5.0f".format(challenge.score)
+      s"$trackParentSlug|$trackSlug|$scoreString|[${challenge.slug}](./$relativePath/)"
     }
+
+    val contestIndexPath = filePathInContestDir(contest, "readme.md")
+    val existing =
+      if (Files.exists(contestIndexPath)) {
+        val lines = Files
+          .readAllLines(contestIndexPath, StandardCharsets.UTF_8)
+          .asScala
+        lines.drop(4)
+      } else Seq.empty
+
+    val merged = (existing ++ index)
+      .groupBy(identity)
+      .keys
+      .toSeq
+      .sorted
+    val indexMd =
+      s"# ${contest.slug}\n\n$tableHeader\n${merged.mkString("\n")}"
+
+    Files.write(contestIndexPath,
+                indexMd.getBytes(StandardCharsets.UTF_8),
+                StandardOpenOption.CREATE,
+                StandardOpenOption.TRUNCATE_EXISTING)
   }
 
-  private def filePathInContestDir(
-                                    contest: Contest, fileName: String) = Paths.get(
-    outputDir,
-    contest.slug,
-    fileName
-  )
-
-  private def challengeDirPath(
-                                contest: Contest,
-                                challenge: Challenge) =
-    challenge.track.map { case track =>
-      Paths.get(
-        outputDir,
-        contest.slug,
-        track.parent_slug,
-        track.slug,
-        challenge.slug
-      )
-    }.getOrElse(
-      Paths.get(
-        outputDir,
-        contest.slug,
-        challenge.slug
-      )
+  private def filePathInContestDir(contest: Contest, fileName: String) =
+    Paths.get(
+      outputDir,
+      contest.slug,
+      fileName
     )
 
+  private def challengeDirPath(contest: Contest, challenge: Challenge) =
+    challenge.track
+      .map(
+        track =>
+          Paths.get(
+            outputDir,
+            contest.slug,
+            track.parent_slug,
+            track.slug,
+            challenge.slug
+        ))
+      .getOrElse(
+        Paths.get(
+          outputDir,
+          contest.slug,
+          challenge.slug
+        )
+      )
 
-  private def filePathInChallenge(
-                                   contest: Contest,
-                                   challenge: Challenge,
-                                   fileName: String) =
-    challenge.track.map { case track =>
-      Paths.get(
-        outputDir,
-        contest.slug,
-        track.parent_slug,
-        track.slug,
-        challenge.slug,
-        fileName
+  private def filePathInChallenge(contest: Contest,
+                                  challenge: Challenge,
+                                  fileName: String) =
+    challenge.track
+      .map(
+        track =>
+          Paths.get(
+            outputDir,
+            contest.slug,
+            track.parent_slug,
+            track.slug,
+            challenge.slug,
+            fileName
+        ))
+      .getOrElse(
+        Paths.get(
+          outputDir,
+          contest.slug,
+          challenge.slug,
+          fileName
+        )
       )
-    }.getOrElse(
-      Paths.get(
-        outputDir,
-        contest.slug,
-        challenge.slug,
-        fileName
-      )
-    )
 
   private def saveSubmission(contest: Contest,
                              challenge: Challenge,
@@ -148,9 +157,9 @@ class LocalFileStore(
     if (overrideExisting || !Files.exists(submissionPath)) {
       logger.debug(s"Writing submission: $submissionPath")
       Files.write(submissionPath,
-        submission.sourceCode.getBytes(StandardCharsets.UTF_8),
-        StandardOpenOption.CREATE,
-        StandardOpenOption.TRUNCATE_EXISTING)
+                  submission.sourceCode.getBytes(StandardCharsets.UTF_8),
+                  StandardOpenOption.CREATE,
+                  StandardOpenOption.TRUNCATE_EXISTING)
     } else logger.debug(s"File exists: $submissionPath")
   }
 
@@ -176,9 +185,14 @@ class LocalFileStore(
 
 object LocalFileStore extends LazyLogging {
 
-  import java.nio.file.Files
+  import java.io.{FileOutputStream, IOException}
+  import java.nio.channels.{Channels, ReadableByteChannel}
+  import java.nio.file.{Files, Path}
+
+  import scala.concurrent.blocking
 
   def createDir(dirPath: Path): Unit = {
+    logger.debug(s"mkdir -p $dirPath")
     if (Files.exists(dirPath)) {
       logger.debug(s"Directory exists: $dirPath")
     } else {
@@ -190,13 +204,6 @@ object LocalFileStore extends LazyLogging {
       }
     }
   }
-
-  import java.io.{FileOutputStream, IOException}
-  import java.nio.channels.{Channels, ReadableByteChannel}
-  import java.nio.file.{Files, Path}
-
-  import scala.concurrent.blocking
-  // This Method Is Used To Download A Sample File From The Url// This Method Is Used To Download A Sample File From The Url
 
   private def downloadFileFromUrl(fromUrl: URI, toFilePath: Path): Unit = {
     blocking {
@@ -211,18 +218,16 @@ object LocalFileStore extends LazyLogging {
           rbcObj = Channels.newChannel(fromUrl.toURL.openStream)
           fileOutputStream = new FileOutputStream(toFilePath.toString)
           fileOutputStream.getChannel.transferFrom(rbcObj, 0, Long.MaxValue)
-          logger.debug(s"File ${toFilePath} downloaded from ${fromUrl}")
+          logger.debug(s"File $toFilePath downloaded from $fromUrl")
         } catch {
           case ioEx: IOException =>
-            logger.error(
-              s"Problem downloading ${toFilePath} from ${fromUrl}", ioEx)
+            logger.error(s"Problem downloading $toFilePath from $fromUrl", ioEx)
         } finally try {
           Option(fileOutputStream).foreach(_.close())
           Option(rbcObj).foreach(_.close())
         } catch {
           case ioEx: IOException =>
-            logger.error(
-              s"Problem closing ${toFilePath}", ioEx)
+            logger.error(s"Problem closing $toFilePath", ioEx)
         }
       }
     }

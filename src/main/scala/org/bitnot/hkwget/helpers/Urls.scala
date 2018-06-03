@@ -23,21 +23,16 @@ object Urls {
     * Submissions to a challenge
     **/
   def challengeSubmissions(challenge: String,
-                         contest: String = "master",
-                         offset: Int = 0,
-                         limit: Int = 1000) =
+                           contest: String = "master",
+                           offset: Int = 0,
+                           limit: Int = 1000) =
     uri"https://www.hackerrank.com/rest/contests/$contest/challenges/$challenge/submissions/?offset=$offset&limit=$limit"
 
-
-  def problemStatement(challenge: String,
-                       contest: String = "master") =
+  def problemStatement(challenge: String, contest: String = "master") =
     uri"https://www.hackerrank.com/rest/contests/${contest}/challenges/${challenge}/download_pdf?language=English"
 
-
-  def problemTestCases(challenge: String,
-                       contest: String = "master") =
+  def problemTestCases(challenge: String, contest: String = "master") =
     uri"https://www.hackerrank.com/rest/contests/${contest}/challenges/${challenge}/download_testcases"
-
 
   /**
     * List of submissions:
@@ -48,16 +43,9 @@ object Urls {
     uri"https://www.hackerrank.com/rest/contests/$contest/submissions/?offset=$offset&limit=$limit"
 
   /**
-    * List of contests:
-    **/
-  def contests(offset: Int = 0, limit: Int = 1000) =
-    uri"https://www.hackerrank.com/rest/contests/upcoming?offset=$offset&limit=$limit&contest_slug=active"
-
-  /**
     * List of languages:
     **/
   def languages = uri"http://api.hackerrank.com/checker/languages.json"
-
 
   def contestParticipation(login: String, offset: Int = 0, limit: Int = 1000) =
     uri"https://www.hackerrank.com/rest/hackers/${login}/contest_participation?offset=${offset}&limit=${limit}"

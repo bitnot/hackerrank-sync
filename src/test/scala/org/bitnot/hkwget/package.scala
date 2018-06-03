@@ -3,9 +3,6 @@ package org.bitnot
 package object hkwget {
 
   object JsonStubs {
-    lazy val contests =
-      scala.io.Source.fromResource("contests.json").getLines().mkString
-
     lazy val contestParticipations =
       scala.io.Source.fromResource("contestParticipations.json").getLines().mkString
 

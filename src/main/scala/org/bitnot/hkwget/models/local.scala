@@ -3,21 +3,18 @@ package org.bitnot.hkwget.models
 import org.bitnot.hkwget.models.hackerrank.{Submission => OnlineSubmission}
 import org.bitnot.hkwget.models.local.Submission
 
-
 package object local {
 
   /*
-  * $outDir/$contest/$challenge/solution.lang - latest accepted solution in lang
-  * */
+   * $outDir/$contest/$challenge/solution.lang - latest accepted solution in lang
+   * */
 
-  case class Language(name: String,
-                      fileExtension: String)
+  case class Language(name: String, fileExtension: String)
 
   case class Submission(id: Long,
                         slug: String,
                         sourceCode: String,
-                        language: Language
-                       )
+                        language: Language)
 
   object Language {
     // todo: make dynamic
@@ -83,15 +80,16 @@ package object local {
       "xquery" -> "xquery"
     )
 
-    def apply(languageCode: String): Language = Language(languageCode, extensions.getOrElse(languageCode, languageCode))
+    def apply(languageCode: String): Language =
+      Language(languageCode, extensions.getOrElse(languageCode, languageCode))
   }
 
   object Submission {
 
-    def apply(onlineSubmission: OnlineSubmission
-             ): Submission =
+    def apply(onlineSubmission: OnlineSubmission): Submission =
       Submission(
-        onlineSubmission.id, onlineSubmission.slug,
+        onlineSubmission.id,
+        onlineSubmission.slug,
         onlineSubmission.code,
         Language(onlineSubmission.language)
       )
@@ -100,66 +98,57 @@ package object local {
 }
 
 case class Challenge(
-                      slug: String,
-                      submissions: Seq[Submission],
-                      track: Option[Track],
-                      score: Double
-                    )
+    slug: String,
+    submissions: Seq[Submission],
+    track: Option[Track],
+    score: Double
+)
 
 case class Track(slug: String, parent_slug: String)
 
 case class Contest(slug: String, challenges: Seq[Challenge])
 
-case class Profile(
-                    contests: Seq[Contest]
-                  )
+class Profile(
+    val contests: Seq[Contest]
+)
 
 object Profile {
-  val defaultTrack = Track("default", "default")
 
-  def from(submissions: Seq[OnlineSubmission]): Profile = {
-    def filterAccepted(submissions: Seq[OnlineSubmission]) = {
-      submissions
-        .filter(_.accepted)
-    }
-
-    def filterLatestByChallengeByLang(submissions: Seq[OnlineSubmission]) = {
-      submissions
-        .groupBy(s => (s.challenge_id, s.language))
-        .map { case (_, submissions) =>
-          submissions.maxBy(_.id)
-        }
-    }
-
-    val latestAccepted = filterLatestByChallengeByLang(filterAccepted(submissions))
-    val contests: Seq[Contest] = latestAccepted
+  def apply(submissions: Seq[OnlineSubmission]): Profile = {
+    val solved = submissions.filter(_.accepted)
+    val latest = solved
+      .groupBy(s => (s.challenge_id, s.language))
+      .values
+      .map(_.maxBy(_.id))
+    val contests = latest
       .groupBy(_.contest_slug)
-      .map { case (contest_slug, submissions) =>
-        val challenges = submissions
-          .groupBy(_.challenge_slug)
-          .map { case (challenge_slug, submissions) =>
+      .map((toContest _).tupled)
+      .toSeq
 
-            val track = submissions
-              .headOption
-              .map(s => s.track.map(t => Track(t.slug, t.track_slug)))
-              .flatten
-
-            val score: Double = submissions
-              .headOption
-              .map(s => s.display_score.map(_.toDouble).getOrElse(0.0))
-              .getOrElse(0.0)
-
-            Challenge(
-              challenge_slug,
-              submissions.map(s => Submission(s)).toSeq,
-              track,
-              score
-            )
-          }.toSeq
-        Contest(contest_slug, challenges)
-      }.toSeq
-
-    Profile(contests)
+    new Profile(contests)
   }
 
+  private def toContest(contest_slug: String,
+                        submissions: Iterable[OnlineSubmission]): Contest = {
+    val challenges = submissions
+      .groupBy(_.challenge_slug)
+      .map((toChallenge _).tupled)
+      .toSeq
+    Contest(contest_slug, challenges)
+  }
+
+  private def toChallenge(
+      challenge_slug: String,
+      submissions: Iterable[OnlineSubmission]): Challenge = {
+    //note: `submissions` cannot be empty, since is a result of `groupBy`
+    val top = submissions.head
+    val track = top.track.map(t => Track(t.slug, t.track_slug))
+    val score = top.display_score.getOrElse(0.0)
+    Challenge(
+      challenge_slug,
+      submissions.map(Submission.apply).toSeq,
+      track,
+      score
+    )
+  }
 }
