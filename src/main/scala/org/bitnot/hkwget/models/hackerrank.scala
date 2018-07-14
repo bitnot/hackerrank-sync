@@ -87,9 +87,9 @@ object CirceConfig {
                     slug: String,
                     track_id: Int,
                     track_name: String,
-                    track_slug: String,
+                    track_slug: String
                     // rewards_system_enabled: Option[Any],
-                    taxonomy: Int
+                    //taxonomy: Int
                   )
 
   case class ChallengeName(

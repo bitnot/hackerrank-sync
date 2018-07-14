@@ -77,7 +77,7 @@ case class DummyHackeRankAuth(cookies: String)
     with LazyLogging {
   def setHeaders(req: NewRequest): NewRequest = {
     val CookieHeader = "Cookie"
-    logger.debug(s"Authenticating with cookie")
+    logger.trace(s"Authenticating with cookie")
     req.header(CookieHeader, cookies)
   }
 }
@@ -201,8 +201,6 @@ object HackerRankHttpService extends LazyLogging {
       .get(uri)
       .response(asJson[T])
       .send()
-
-    logger.debug(s"got response ${response.getClass}")
 
     response.body match {
       case Right(Right(t)) =>
