@@ -1,0 +1,6 @@
+hkwget {
+  auth {
+    login: "your hackerrank username (not email)"
+    hrank_session: "the value of hrank_session cookie from your browser"
+  }
+}
