@@ -6,11 +6,9 @@ import com.softwaremill.sttp._
 import com.softwaremill.sttp.circe._
 import com.typesafe.scalalogging.LazyLogging
 import io.circe.generic.auto._
-import io.circe.java8.time._
 import org.bitnot.hkwget.helpers.CustomDecoders._
 import org.bitnot.hkwget.helpers._
 import org.bitnot.hkwget.models.hackerrank._
-import org.bitnot.hkwget.services.HackeRankAuth.NewRequest
 
 import scala.util._
 
@@ -18,87 +16,42 @@ trait HackerRankService {
 
   /**
     * Gets all programming languages supported by HR
-    * */
+    **/
   def getLanguages(): Try[LanguagesResponse]
 
   /**
     * Gets contests user has participated in
-    * */
+    **/
   def getContestParticipations(): Try[ApiResponse[ContestParticipation]]
 
   /**
     * Gets all submissions by user
-    * @param timeToLookBack - how far back from now to look for submissions
+    *
+    * @param timeToLookBack           - how far back from now to look for submissions
     * @param maxSubmissionsPerContest - how many submissions to any contest to take
-    * */
+    **/
   def getSubmissions(
-      timeToLookBack: Option[Duration] = None,
-      maxSubmissionsPerContest: Option[Int] = None): Try[Seq[Submission]]
+                      timeToLookBack: Option[Duration] = None,
+                      maxSubmissionsPerContest: Option[Int] = None): Try[Seq[Submission]]
 }
 
-trait HackeRankAuth {
-  def setHeaders(req: NewRequest): NewRequest
-}
-
-object HackeRankAuth {
-  type NewRequest = RequestT[Empty, String, Nothing]
-
-  implicit class Authorizer(req: NewRequest)(implicit auth: HackeRankAuth) {
-    def authorize(): NewRequest = auth.setHeaders(req)
-  }
-
-}
-
-/*
-// TODO: Figure out how auth actually works
-case class BasicHackeRankAuth(login: String, password: String)(
-  implicit backend: SttpBackend[Id, Nothing]
-) extends HackeRankAuth with LazyLogging {
-
-  def setHeaders(req: NewRequest): NewRequest = {
-
-    logger.debug(s"Authenticating $login")
-    val loginResponse =
-      sttp
-        .post(Urls.login)
-        .body(Credentials(login, password))
-        .send()
-    val CookieHeader = "Cookie"
-
-    val cookies =
-      loginResponse.cookies.map(p => p.name + "=" + p.value).mkString("; ")
-    // TODO: FIX ME
-    req.header(CookieHeader, cookies)
-  }
-}*/
-
-case class DummyHackeRankAuth(cookies: String)
-    extends HackeRankAuth
-    with LazyLogging {
-  def setHeaders(req: NewRequest): NewRequest = {
-    val CookieHeader = "Cookie"
-    logger.trace(s"Authenticating with cookie")
-    req.header(CookieHeader, cookies)
-  }
-}
 
 class HackerRankHttpService(username: String,
                             contestBlackList: Set[String] = Set.empty)(
-    implicit
-    auth: HackeRankAuth,
-    backend: SttpBackend[Id, Nothing] = HttpURLConnectionBackend())
-    extends HackerRankService
+                             implicit
+                             auth: HackeRankAuth,
+                             backend: SttpBackend[Id, Nothing] = HttpURLConnectionBackend())
+  extends HackerRankService
     with LazyLogging {
 
   import HackerRankHttpService.get
 
-  def getLanguages(): Try[LanguagesResponse] =
-    get[LanguagesResponse](Urls.languages)
+  def getLanguages(): Try[LanguagesResponse] = get[LanguagesResponse](Urls.languages)
 
   override def getSubmissions(
-      timeToLookBack: Option[Duration] = None,
-      maxSubmissionsPerContestToSave: Option[Int] = None)
-    : Try[Seq[Submission]] = {
+                               timeToLookBack: Option[Duration] = None,
+                               maxSubmissionsPerContestToSave: Option[Int] = None)
+  : Try[Seq[Submission]] = {
     logger.info("running getSubmissions")
 
     val sinceUnixSeconds = timeToLookBack.map {
@@ -108,12 +61,15 @@ class HackerRankHttpService(username: String,
     def trim(previews: Seq[SubmissionPreview]) =
       trimPreviews(previews, sinceUnixSeconds, maxSubmissionsPerContestToSave)
 
-    getContestParticipations.map { participation =>
-      val contestNames = "master" :: participation.models.collect {
+
+    val contestNames = "master" :: getContestParticipations.map { participation =>
+      participation.models.collect {
         case x if x.hacker_rank.isDefined => x.slug
       }.toList
-      val whitelisted = contestNames.filterNot(contestBlackList.contains)
+    }.getOrElse(List.empty)
 
+    val whitelisted = contestNames.filterNot(contestBlackList.contains)
+    Try {
       val previewsPerContest = whitelisted
         .map(
           contestName =>
@@ -130,10 +86,10 @@ class HackerRankHttpService(username: String,
   }
 
   private def trimPreviews(
-      previews: Seq[SubmissionPreview],
-      sinceUnixSeconds: Option[Long],
-      maxSubmissionsPerContestToSave: Option[Int]
-  ): Seq[SubmissionPreview] = {
+                            previews: Seq[SubmissionPreview],
+                            sinceUnixSeconds: Option[Long],
+                            maxSubmissionsPerContestToSave: Option[Int]
+                          ): Seq[SubmissionPreview] = {
     val solved = previews.filter(_.accepted)
 
     val dedupped = takeLatestByChallengeByLang(solved)
@@ -151,9 +107,9 @@ class HackerRankHttpService(username: String,
   }
 
   private def previewsToSubmissions(
-      contestName: String,
-      previews: Seq[SubmissionPreview]
-  ): Seq[Submission] = {
+                                     contestName: String,
+                                     previews: Seq[SubmissionPreview]
+                                   ): Seq[Submission] = {
     logger.debug(s"${previews.size} previews  in ${contestName}")
 
     val submissions = previews.map { preview =>
@@ -178,7 +134,7 @@ class HackerRankHttpService(username: String,
     get[ApiResponse[ContestParticipation]](Urls.contestParticipation(username))
 
   private def getSubmissionPreviews(
-      contestName: String = "master"): Try[ApiResponse[SubmissionPreview]] =
+                                     contestName: String = "master"): Try[ApiResponse[SubmissionPreview]] =
     get[ApiResponse[SubmissionPreview]](
       Urls.submissions(contest = contestName, limit = 1000))
 
@@ -196,11 +152,13 @@ object HackerRankHttpService extends LazyLogging {
                        decoder: io.circe.Decoder[T]): Try[T] = {
     import HackeRankAuth._
     logger.debug(s"getting $uri")
-    val response = sttp
+    val request = emptyRequest
       .authorize()
       .get(uri)
       .response(asJson[T])
-      .send()
+
+    logger.debug(s"Request:\n${request.toCurl}")
+    val response = request.send()
 
     response.body match {
       case Right(Right(t)) =>
@@ -208,7 +166,7 @@ object HackerRankHttpService extends LazyLogging {
         Success(t)
       case Right(Left(circeError)) =>
         logger.error(s"$circeError")
-        Failure(circeError)
+        Failure(circeError.error)
       case Left(s: String) =>
         logger.error(s)
         Failure(new Exception(s))

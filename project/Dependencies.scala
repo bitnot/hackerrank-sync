@@ -6,8 +6,7 @@ object Dependencies {
     "io.circe" %% "circe-core",
     "io.circe" %% "circe-generic",
     "io.circe" %% "circe-parser",
-    "io.circe" %% "circe-generic-extras",
-    "io.circe" %% "circe-java8"
+    "io.circe" %% "circe-generic-extras"
   ).map(_ % Versions.circeVersion)
 
   val commonDeps = Seq(
@@ -25,11 +24,11 @@ object Dependencies {
   )
 
   object Versions {
-    val circeVersion = "0.9.3"
+    val circeVersion = "0.12.1"
     val logback = "1.2.3"
     val scalamock = "4.1.0"
     val scalatest = "3.0.5"
-    val sttp = "1.1.12"
+    val sttp = "1.7.2"
     val typesafeConfig = "1.3.1"
   }
 

@@ -2,8 +2,8 @@ import Dependencies._
 
 name := "hkwget"
 organization := "org.bitnot"
-version := "0.0.1"
-scalaVersion := "2.12.4"
+version := "0.0.2"
+scalaVersion := "2.12.12"
 
 resolvers ++= Seq(
   DefaultMavenRepository,

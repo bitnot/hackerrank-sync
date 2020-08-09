@@ -1,7 +1,6 @@
 package org.bitnot.hkwget.models.local
 
 import io.circe.generic.auto._
-import io.circe.java8.time._
 import io.circe.parser._
 import org.bitnot.hkwget.JsonStubs
 import org.bitnot.hkwget.models.Profile

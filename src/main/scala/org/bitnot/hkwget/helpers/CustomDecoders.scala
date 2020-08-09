@@ -5,7 +5,6 @@ import java.time.ZonedDateTime
 import org.bitnot.hkwget.models.hackerrank._
 
 object CustomDecoders {
-  import io.circe.java8.time.decodeZonedDateTimeDefault
   import io.circe.{Decoder, HCursor}
 
   implicit val decodeContestParticipation: Decoder[ContestParticipation] =
