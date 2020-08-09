@@ -27,7 +27,7 @@ Example:
 default_cdn_url=hrcdn.net; _hrank_session=12ghv3123kh1v2k3ghv1k2h3gv12hg3v12gh3v1; cdn_url=hrcdn.net; cdn_set=true; __utma=74197771.123123.1523563402.1523563402.1523563402.1; __utmc=123123123; ...
 ```
 
-Compile project with sbt as you usually would and run it.
+tl;dr: Compile project with sbt as you usually would and run it.
 
 Note:
 
@@ -35,6 +35,13 @@ It is pretty slow right now as all the downloads are synchronous,
 on the bright side it does not DDOS HackerRank API. 
 
 So plug in your laptop and go do something useful.
+
+1. Install sbt: https://www.scala-sbt.org/1.x/docs/Setup.html
+2. Run `sbt` in the root folder
+3. Wait for sbt to download all the sbt dependencies…
+4. Inside sbt console run `compile` command
+5. Wait for sbt to download all the project dependencies and compile the source code…
+6. Inside sbt console run `run` command
 
 ## TODO
 
