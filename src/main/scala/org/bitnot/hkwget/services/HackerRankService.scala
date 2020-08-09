@@ -111,14 +111,14 @@ class HackerRankHttpService(username: String,
                                      contestName: String,
                                      previews: Seq[SubmissionPreview]
                                    ): Seq[Submission] = {
-    logger.debug(s"${previews.size} previews  in ${contestName}")
+    logger.debug(s"${previews.size} previews in ${contestName}")
 
-    val submissions = previews.map { preview =>
+    val submissions = previews.flatMap { preview =>
       val maybeSubmission = getSubmission(contestName, preview)
       maybeSubmission
         .map(_.model)
         .toOption
-    }.flatten
+    }
     submissions
   }
 
@@ -154,12 +154,12 @@ object HackerRankHttpService extends LazyLogging {
     import HackeRankAuth._
     logger.debug(s"getting $uri")
     val request = emptyRequest
-      .header("User-Agent", "curl/7.54", true)
+      .header("User-Agent", "curl/7.67", true)
       .authorize()
       .get(uri)
       .response(asJson[T])
 
-//    logger.debug(s"Request:\n${request.toCurl}")
+    //    logger.debug(s"Request:\n${request.toCurl}")
     val response = request.send()
 
     response.body match {
@@ -169,9 +169,9 @@ object HackerRankHttpService extends LazyLogging {
       case Right(Left(circeError)) =>
         logger.error(s"$circeError")
         Failure(circeError.error)
-      case Left(s: String) =>
-        logger.error(s)
-        Failure(new Exception(s))
+      case Left(body: String) =>
+        logger.error(s"${response.code} ${response.statusText}\n${body}")
+        Failure(new Exception(body))
     }
   }
 
