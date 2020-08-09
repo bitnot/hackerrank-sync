@@ -6,12 +6,12 @@ import com.typesafe.scalalogging.LazyLogging
 import org.bitnot.hkwget.models.Profile
 import org.bitnot.hkwget.services.{HackeRankAuth, HackerRankHttpService, LocalFileStore, SessionCookieAuth}
 
-import scala.concurrent.duration.Duration
+import java.time.Duration
 
 
 object Main extends App with LazyLogging {
   val config = HKConfig(ConfigFactory.load().getConfig("hkwget"))
-  val timeToLookBackO = if (config.timeToLookBack == Duration.Zero) None else Some(config.timeToLookBack)
+  val timeToLookBackO = if (config.timeToLookBack == Duration.ZERO) None else Some(config.timeToLookBack)
   val maxPerContestO = if (config.maxPerContest == 0) None else Some(config.maxPerContest)
   val store = new LocalFileStore(config.outputDir, false)
   implicit val auth: HackeRankAuth = SessionCookieAuth(config.sessionCookieValue)
