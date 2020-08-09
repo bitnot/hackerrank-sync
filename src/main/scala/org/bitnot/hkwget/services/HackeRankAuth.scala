@@ -47,15 +47,16 @@ case class FullCookieAuth(cookie: String)
   def setHeaders(req: NewRequest): NewRequest = {
     val CookieHeader = "Cookie"
     logger.trace(s"Authenticating with cookie")
-    req.header(CookieHeader, cookie.stripLineEnd)
+    req.header(CookieHeader, cookie.stripLineEnd, true)
   }
 }
 
-case class SessionCookieAuth(hrankSessionCookeValue: String)
+case class SessionCookieAuth(sessionCookieValue: String)
   extends HackeRankAuth
     with LazyLogging {
   def setHeaders(req: NewRequest): NewRequest = {
+    val CookieHeader = "Cookie"
     logger.trace(s"Authenticating with hrank_session cookie")
-    req.cookie("_hrank_session", hrankSessionCookeValue)
+    req.header(CookieHeader, s"_hrank_session=${sessionCookieValue}", true)
   }
 }
