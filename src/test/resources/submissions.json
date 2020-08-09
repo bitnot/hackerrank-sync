@@ -1,0 +1,173 @@
+{
+  "models": [
+    {
+      "id": 14419845,
+      "challenge_id": 5529,
+      "contest_id": 1,
+      "hacker_id": 1216941,
+      "status": "Accepted",
+      "kind": "code",
+      "created_at": 1594567081,
+      "language": "python3",
+      "hacker_username": null,
+      "time_ago": "28 days",
+      "in_contest_bounds": true,
+      "status_code": 1,
+      "score": "40.0",
+      "is_preliminary_score": null,
+      "challenge": {
+        "name": "Flipping bits",
+        "slug": "flipping-bits"
+      },
+      "inserttime": 1594567081
+    },
+    {
+      "id": 168520359,
+      "challenge_id": 5529,
+      "contest_id": 1,
+      "hacker_id": 1216941,
+      "status": "Accepted",
+      "kind": "code",
+      "created_at": 1594565079,
+      "language": "python3",
+      "hacker_username": null,
+      "time_ago": "28 days",
+      "in_contest_bounds": true,
+      "status_code": 1,
+      "score": "40.0",
+      "is_preliminary_score": null,
+      "challenge": {
+        "name": "Flipping bits",
+        "slug": "flipping-bits"
+      },
+      "inserttime": 1594565079
+    },
+    {
+      "id": 106363616,
+      "challenge_id": 457,
+      "contest_id": 1,
+      "hacker_id": 1216941,
+      "status": "Accepted",
+      "kind": "code",
+      "created_at": 1556707650,
+      "language": "python3",
+      "hacker_username": null,
+      "time_ago": "over 1 year",
+      "in_contest_bounds": true,
+      "status_code": 2,
+      "score": "35.0",
+      "is_preliminary_score": null,
+      "challenge": {
+        "name": "Find the Median",
+        "slug": "find-the-median"
+      },
+      "inserttime": 1556707650
+    },
+    {
+      "id": 97069443,
+      "challenge_id": 77,
+      "contest_id": 1,
+      "hacker_id": 1216941,
+      "status": "Accepted",
+      "kind": "code",
+      "created_at": 1548596961,
+      "language": "python3",
+      "hacker_username": null,
+      "time_ago": "over 1 year",
+      "in_contest_bounds": true,
+      "status_code": 2,
+      "score": "70.0",
+      "is_preliminary_score": null,
+      "challenge": {
+        "name": "Changing Bits",
+        "slug": "changing-bits"
+      },
+      "inserttime": 1548596961
+    },
+    {
+      "id": 97066260,
+      "challenge_id": 3168,
+      "contest_id": 1,
+      "hacker_id": 1216941,
+      "status": "Accepted",
+      "kind": "code",
+      "created_at": 1548594606,
+      "language": "python3",
+      "hacker_username": null,
+      "time_ago": "over 1 year",
+      "in_contest_bounds": true,
+      "status_code": 1,
+      "score": "50.0",
+      "is_preliminary_score": null,
+      "challenge": {
+        "name": "Consecutive Subsequences",
+        "slug": "consecutive-subsequences"
+      },
+      "inserttime": 0
+    },
+    {
+      "id": 96999830,
+      "challenge_id": 11742,
+      "contest_id": 1,
+      "hacker_id": 1216941,
+      "status": "Accepted",
+      "kind": "code",
+      "created_at": 1548525941,
+      "language": "python",
+      "hacker_username": null,
+      "time_ago": "over 1 year",
+      "in_contest_bounds": true,
+      "status_code": 2,
+      "score": "10.0",
+      "is_preliminary_score": null,
+      "challenge": {
+        "name": "String Validators",
+        "slug": "string-validators"
+      },
+      "inserttime": 1548525941
+    },
+    {
+      "id": 96999415,
+      "challenge_id": 1373,
+      "contest_id": 1,
+      "hacker_id": 1216941,
+      "status": "Accepted",
+      "kind": "code",
+      "created_at": 1548525691,
+      "language": "python",
+      "hacker_username": null,
+      "time_ago": "over 1 year",
+      "in_contest_bounds": true,
+      "status_code": 2,
+      "score": "10.0",
+      "is_preliminary_score": null,
+      "challenge": {
+        "name": "Find a string",
+        "slug": "find-a-string"
+      },
+      "inserttime": 1548525691
+    },
+    {
+      "id": 96998990,
+      "challenge_id": 7890,
+      "contest_id": 1,
+      "hacker_id": 1216941,
+      "status": "Accepted",
+      "kind": "code",
+      "created_at": 1548525389,
+      "language": "python",
+      "hacker_username": null,
+      "time_ago": "over 1 year",
+      "in_contest_bounds": true,
+      "status_code": 2,
+      "score": "10.0",
+      "is_preliminary_score": null,
+      "challenge": {
+        "name": "Mutations",
+        "slug": "python-mutations"
+      },
+      "inserttime": 1548525389
+    }
+  ],
+  "total": 503
+}

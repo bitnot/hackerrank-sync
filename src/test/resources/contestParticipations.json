@@ -1,0 +1,115 @@
+{
+  "models": [
+    {
+      "hacker_rank": 253,
+      "contest_ended": true,
+      "total_participants": 6256,
+      "contest_id": 30603,
+      "created_at": "2018-04-16T07:00:00Z",
+      "name": "Week of Code 37",
+      "slug": "w37",
+      "medal": "silver"
+    },
+    {
+      "hacker_rank": 711,
+      "contest_ended": true,
+      "total_participants": 1709,
+      "contest_id": 26681,
+      "created_at": "2018-04-02T15:00:00Z",
+      "name": "HourRank 27",
+      "slug": "hourrank-27",
+      "medal": null
+    },
+    {
+      "hacker_rank": 1250,
+      "contest_ended": true,
+      "total_participants": 8395,
+      "contest_id": 16069,
+      "created_at": "2017-05-15T07:00:00Z",
+      "name": "Week of Code 32",
+      "slug": "w32",
+      "medal": "bronze"
+    },
+    {
+      "hacker_rank": 351,
+      "contest_ended": true,
+      "total_participants": 12280,
+      "contest_id": 8075,
+      "created_at": "2016-08-08T07:00:00Z",
+      "name": "Week of Code 22",
+      "slug": "w22",
+      "medal": "gold"
+    },
+    {
+      "hacker_rank": 136,
+      "contest_ended": true,
+      "total_participants": 3029,
+      "contest_id": 8201,
+      "created_at": "2016-08-05T10:00:00Z",
+      "name": "Booking.com Back End CodeSprint",
+      "slug": "booking-passions-hacked-backend",
+      "medal": null
+    },
+    {
+      "hacker_rank": "--",
+      "contest_ended": true,
+      "total_participants": 2918,
+      "contest_id": 8208,
+      "created_at": "2016-07-26T16:00:00Z",
+      "name": "RookieRank",
+      "slug": "rookierank",
+      "medal": null
+    },
+    {
+      "hacker_rank": 2482,
+      "contest_ended": true,
+      "total_participants": 6426,
+      "contest_id": 8089,
+      "created_at": "2016-07-23T16:00:00Z",
+      "name": "World CodeSprint 5",
+      "slug": "world-codesprint-5",
+      "medal": null
+    },
+    {
+      "hacker_rank": 310,
+      "contest_ended": true,
+      "total_participants": 9026,
+      "contest_id": 7575,
+      "created_at": "2016-06-27T16:00:00Z",
+      "name": "Week of Code 21",
+      "slug": "w21",
+      "medal": "gold"
+    },
+    {
+      "hacker_rank": 557,
+      "contest_ended": true,
+      "total_participants": 5236,
+      "contest_id": 7607,
+      "created_at": "2016-06-25T16:00:00Z",
+      "name": "World CodeSprint #4",
+      "slug": "june-world-codesprint",
+      "medal": "silver"
+    },
+    {
+      "hacker_rank": 1278,
+      "contest_ended": true,
+      "total_participants": 1470,
+      "contest_id": 7392,
+      "created_at": "2016-06-04T10:00:00Z",
+      "name": "Zalando CodeSprint",
+      "slug": "zalando-codesprint",
+      "medal": null
+    },
+    {
+      "hacker_rank": "--",
+      "contest_ended": false,
+      "total_participants": 127757,
+      "contest_id": 1075,
+      "created_at": "2014-07-07T15:38:00Z",
+      "name": "ProjectEuler+",
+      "slug": "projecteuler",
+      "medal": null
+    }
+  ],
+  "total": 11
+}
