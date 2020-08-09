@@ -3,7 +3,7 @@ import Dependencies._
 name := "hkwget"
 organization := "org.bitnot"
 version := "0.0.2"
-scalaVersion := "2.12.12"
+scalaVersion := "2.13.3"
 
 resolvers ++= Seq(
   DefaultMavenRepository,

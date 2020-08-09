@@ -12,7 +12,7 @@ object Dependencies {
   val commonDeps = Seq(
     "com.typesafe" % "config" % Versions.typesafeConfig,
     "ch.qos.logback" % "logback-classic" % Versions.logback,
-    "com.typesafe.scala-logging" %% "scala-logging" % "3.9.0"
+    "com.typesafe.scala-logging" %% "scala-logging" % Versions.scalaLogging
   )
 
   val scalaMock = "org.scalamock" %% "scalamock" % Versions.scalamock
@@ -24,12 +24,13 @@ object Dependencies {
   )
 
   object Versions {
-    val circeVersion = "0.12.1"
+    val circeVersion = "0.13.0"
     val logback = "1.2.3"
-    val scalamock = "4.1.0"
-    val scalatest = "3.0.5"
+    val scalaLogging = "3.9.2"
+    val scalamock = "5.0.0"
+    val scalatest = "3.2.1"
     val sttp = "1.7.2"
-    val typesafeConfig = "1.3.1"
+    val typesafeConfig = "1.4.0"
   }
 
 }

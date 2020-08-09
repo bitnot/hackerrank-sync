@@ -3,7 +3,9 @@ package org.bitnot.hkwget.services
 import scala.language.postfixOps
 
 import org.scalamock.scalatest.MockFactory
-import org.scalatest.{FlatSpec, Matchers, OneInstancePerTest}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.OneInstancePerTest
 import com.softwaremill.sttp.testing.SttpBackendStub
 
 import org.bitnot.hkwget.JsonStubs._
@@ -11,7 +13,7 @@ import org.bitnot.hkwget.services.HackeRankAuth.NewRequest
 
 
 class HackerRankHttpServiceSpec
-    extends FlatSpec
+    extends AnyFlatSpec
     with Matchers
     with OneInstancePerTest
     with MockFactory {

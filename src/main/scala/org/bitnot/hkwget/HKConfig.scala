@@ -18,7 +18,7 @@ object HKConfig {
   def apply(hkwgetConfig: Config
            ): HKConfig = new HKConfig(
 
-    hkwgetConfig.getStringList("contestBlackList").asScala,
+    hkwgetConfig.getStringList("contestBlackList").asScala.toList,
     hkwgetConfig.getString("outputDir"),
     hkwgetConfig.getInt("maxSubmissionsPerContestToSave"),
     hkwgetConfig.getDuration("timeToLookBack"),
