@@ -153,6 +153,7 @@ object HackerRankHttpService extends LazyLogging {
     import HackeRankAuth._
     logger.debug(s"getting $uri")
     val request = emptyRequest
+      .header("User-Agent", "curl/7.54", true)
       .authorize()
       .get(uri)
       .response(asJson[T])
