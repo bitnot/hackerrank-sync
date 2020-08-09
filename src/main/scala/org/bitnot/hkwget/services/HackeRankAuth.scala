@@ -56,6 +56,6 @@ case class SessionCookieAuth(hrankSessionCookeValue: String)
     with LazyLogging {
   def setHeaders(req: NewRequest): NewRequest = {
     logger.trace(s"Authenticating with hrank_session cookie")
-    req.cookie("hrank_session", hrankSessionCookeValue)
+    req.cookie("_hrank_session", hrankSessionCookeValue)
   }
 }
