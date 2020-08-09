@@ -157,7 +157,7 @@ object HackerRankHttpService extends LazyLogging {
       .get(uri)
       .response(asJson[T])
 
-    logger.debug(s"Request:\n${request.toCurl}")
+//    logger.debug(s"Request:\n${request.toCurl}")
     val response = request.send()
 
     response.body match {
