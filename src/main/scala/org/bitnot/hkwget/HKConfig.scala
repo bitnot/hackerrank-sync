@@ -8,7 +8,8 @@ case class HKConfig(
                      outputDir: String,
                      maxPerContest: Int,
                      timeToLookBack: java.time.Duration,
-                     login: String
+                     login: String,
+                     sessionCookieValue: String
                    )
 
 object HKConfig {
@@ -21,6 +22,7 @@ object HKConfig {
     hkwgetConfig.getString("outputDir"),
     hkwgetConfig.getInt("maxSubmissionsPerContestToSave"),
     hkwgetConfig.getDuration("timeToLookBack"),
-    hkwgetConfig.getString("auth.login")
+    hkwgetConfig.getString("auth.login"),
+    hkwgetConfig.getString("auth.hrank_session")
   )
 }

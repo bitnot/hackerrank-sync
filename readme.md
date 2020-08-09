@@ -15,19 +15,8 @@ A dynamic language like JavaScript or Python could have been handier for this ta
 
 ## How to use
 
-At the moment authentication is done via logging in into browser and storing cookies to a file.
-You can ignore `login` and `password` settings in `reference.conf`.
-
-Add a `cookies.txt` to `/src/main/resources/` containing the value of `Cookie` header 
-(1 line formatted as `cookie1_name: cookie1_value; cookie2_name: cookie2_value; ...`) 
-after you have logged into website in your browser.
-
-Example:
-```txt
-default_cdn_url=hrcdn.net; _hrank_session=12ghv3123kh1v2k3ghv1k2h3gv12hg3v12gh3v1; cdn_url=hrcdn.net; cdn_set=true; __utma=74197771.123123.1523563402.1523563402.1523563402.1; __utmc=123123123; ...
-```
-
-tl;dr: Compile project with sbt as you usually would and run it.
+Copy `application.conf.template` to `application.conf`, add any additional settins from `reference.conf`.
+You need to log into Hackerrank in your browser and copy the _value_ of your `hrank_session` cookie.
 
 Note:
 
