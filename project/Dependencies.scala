@@ -29,7 +29,7 @@ object Dependencies {
     val scalaLogging = "3.9.2"
     val scalamock = "5.0.0"
     val scalatest = "3.2.1"
-    val sttp = "2.2.4"
+    val sttp = "2.2.9"
     val typesafeConfig = "1.4.0"
   }
 
