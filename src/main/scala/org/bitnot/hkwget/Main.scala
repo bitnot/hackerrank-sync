@@ -20,7 +20,13 @@ object Main extends App with LazyLogging {
   implicit val auth: HackerRankAuth = SessionCookieAuth(config.sessionCookieValue)
 
   implicit val backend: SttpBackend[Identity, Nothing, NothingT] = new RateLimitingSttpBackend[Identity, Nothing, NothingT](
-    RateLimiter.of("default", RateLimiterConfig.ofDefaults),
+    RateLimiter.of("take it easy",
+      RateLimiterConfig.custom()
+        .limitForPeriod(1)
+        .limitRefreshPeriod(Duration.ofSeconds(6))
+        .timeoutDuration(Duration.ofSeconds(30))
+        .build()
+    ),
     HttpURLConnectionBackend()
   )(IdMonad)
   val hkService = new HackerRankHttpService(config.login, config.contestBlackList.toSet)
