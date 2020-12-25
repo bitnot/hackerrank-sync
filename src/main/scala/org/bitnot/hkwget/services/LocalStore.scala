@@ -152,7 +152,7 @@ class LocalFileStore(outputDir: String, overrideExisting: Boolean = false)
     val submissionPath = filePathInChallenge(
       contest,
       challenge,
-      s"solution.${submission.language.fileExtension}")
+      submission.fileName)
 
     if (overrideExisting || !Files.exists(submissionPath)) {
       logger.debug(s"Writing submission: $submissionPath")

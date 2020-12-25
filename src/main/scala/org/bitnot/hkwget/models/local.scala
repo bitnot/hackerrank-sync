@@ -6,7 +6,7 @@ import org.bitnot.hkwget.models.local.Submission
 package object local {
 
   /*
-   * $outDir/$contest/$challenge/solution.lang - latest accepted solution in lang
+   * $outDir/$contest/$challenge/solution-$id.lang - accepted solution in lang
    * */
 
   case class Language(name: String, fileExtension: String)
@@ -14,7 +14,9 @@ package object local {
   case class Submission(id: Long,
                         slug: String,
                         sourceCode: String,
-                        language: Language)
+                        language: Language){
+    val fileName = s"solution-${id}.${language.fileExtension}"
+  }
 
   object Language {
     // todo: make dynamic
