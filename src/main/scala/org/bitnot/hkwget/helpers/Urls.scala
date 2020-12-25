@@ -1,8 +1,10 @@
 package org.bitnot.hkwget.helpers
 
+import sttp.model.Uri
+
 object Urls {
 
-  import com.softwaremill.sttp._
+  import sttp.client._
 
   /**
     * Endpoint accepting POST for authentication

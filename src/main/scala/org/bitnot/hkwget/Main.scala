@@ -1,6 +1,6 @@
 package org.bitnot.hkwget
 
-import com.softwaremill.sttp.HttpURLConnectionBackend
+import sttp.client.HttpURLConnectionBackend
 import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.LazyLogging
 import org.bitnot.hkwget.models.Profile

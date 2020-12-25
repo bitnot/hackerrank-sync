@@ -1,8 +1,8 @@
 package org.bitnot.hkwget.services
 
-import com.softwaremill.sttp.{Empty, RequestT}
 import com.typesafe.scalalogging.LazyLogging
-import org.bitnot.hkwget.services.HackerRankAuth.NewRequest
+import org.bitnot.hkwget.services.HackerRankAuth._
+import sttp.client.{Empty, RequestT}
 
 
 trait HackerRankAuth {
@@ -10,12 +10,11 @@ trait HackerRankAuth {
 }
 
 object HackerRankAuth {
-  type NewRequest = RequestT[Empty, String, Nothing]
+  type NewRequest = RequestT[Empty, Either[String, String], Nothing]
 
   implicit class Authorizer(req: NewRequest)(implicit auth: HackerRankAuth) {
     def authorize(): NewRequest = auth.setHeaders(req)
   }
-
 }
 
 /*

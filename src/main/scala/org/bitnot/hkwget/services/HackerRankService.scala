@@ -1,14 +1,15 @@
 package org.bitnot.hkwget.services
 
 import java.time.Duration
-
-import com.softwaremill.sttp._
-import com.softwaremill.sttp.circe._
+import sttp.client._
+import sttp.client.circe._
 import com.typesafe.scalalogging.LazyLogging
+import io.circe
 import io.circe.generic.auto._
 import org.bitnot.hkwget.helpers.CustomDecoders._
 import org.bitnot.hkwget.helpers._
 import org.bitnot.hkwget.models.hackerrank._
+import sttp.model.Uri
 
 import scala.util._
 
@@ -38,10 +39,10 @@ trait HackerRankService {
 
 class HackerRankHttpService(username: String,
                             contestBlackList: Set[String] = Set.empty)(
-                             implicit
+                             implicit 
                              auth: HackerRankAuth,
-                             backend: SttpBackend[Id, Nothing] = HttpURLConnectionBackend())
-  extends HackerRankService
+                             backend: SttpBackend[Identity, Nothing, NothingT] = HttpURLConnectionBackend()
+                             ) extends HackerRankService
     with LazyLogging {
 
   import HackerRankHttpService.get
@@ -149,7 +150,7 @@ class HackerRankHttpService(username: String,
 object HackerRankHttpService extends LazyLogging {
   def get[T](uri: Uri)(implicit
                        auth: HackerRankAuth,
-                       backend: SttpBackend[Id, Nothing],
+                       backend: SttpBackend[Identity, Nothing, NothingT],
                        decoder: io.circe.Decoder[T]): Try[T] = {
     import HackerRankAuth._
     logger.debug(s"getting $uri")
@@ -160,18 +161,15 @@ object HackerRankHttpService extends LazyLogging {
       .response(asJson[T])
 
     //    logger.debug(s"Request:\n${request.toCurl}")
-    val response = request.send()
-
+    val response: Identity[Response[Either[ResponseError[circe.Error], T]]] = request.send()
+    val body: Either[ResponseError[circe.Error], T] = response.body
     response.body match {
-      case Right(Right(t)) =>
+      case Right(t) =>
         logger.debug(s"success: ${t.getClass}")
         Success(t)
-      case Right(Left(circeError)) =>
+      case Left(circeError) =>
         logger.error(s"$circeError")
-        Failure(circeError.error)
-      case Left(body: String) =>
-        logger.error(s"${response.code} ${response.statusText}\n${body}")
-        Failure(new Exception(body))
+        Failure(circeError.getCause)
     }
   }
 

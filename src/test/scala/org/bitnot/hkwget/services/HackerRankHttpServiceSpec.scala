@@ -6,7 +6,7 @@ import org.scalamock.scalatest.MockFactory
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.OneInstancePerTest
-import com.softwaremill.sttp.testing.SttpBackendStub
+import sttp.client.testing.SttpBackendStub
 
 import org.bitnot.hkwget.JsonStubs._
 import org.bitnot.hkwget.services.HackerRankAuth.NewRequest
