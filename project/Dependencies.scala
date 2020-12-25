@@ -15,6 +15,10 @@ object Dependencies {
     "com.typesafe.scala-logging" %% "scala-logging" % Versions.scalaLogging
   )
 
+   val resilience4j = Seq(
+     "io.github.resilience4j" % "resilience4j-ratelimiter" % Versions.resilience4j
+   )
+
   val scalaMock = "org.scalamock" %% "scalamock" % Versions.scalamock
   val scalaTest = "org.scalatest" %% "scalatest" % Versions.scalatest
 
@@ -26,6 +30,7 @@ object Dependencies {
   object Versions {
     val circeVersion = "0.13.0"
     val logback = "1.2.3"
+    val resilience4j = "1.6.1"
     val scalaLogging = "3.9.2"
     val scalamock = "5.0.0"
     val scalatest = "3.2.1"

@@ -39,9 +39,9 @@ trait HackerRankService {
 
 class HackerRankHttpService(username: String,
                             contestBlackList: Set[String] = Set.empty)(
-                             implicit 
+                             implicit
                              auth: HackerRankAuth,
-                             backend: SttpBackend[Identity, Nothing, NothingT] = HttpURLConnectionBackend()
+                             backend: SttpBackend[Identity, Nothing, NothingT]
                              ) extends HackerRankService
     with LazyLogging {
 

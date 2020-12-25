@@ -15,6 +15,7 @@ resolvers ++= Seq(
 
 libraryDependencies ++= circe
 libraryDependencies ++= commonDeps
+ libraryDependencies ++= resilience4j
 libraryDependencies ++= sttp
 
 libraryDependencies ++= Seq(scalaTest, scalaMock) map (_ % Test)
