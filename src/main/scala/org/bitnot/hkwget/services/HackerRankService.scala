@@ -91,7 +91,11 @@ class HackerRankHttpService(username: String,
                             sinceUnixSeconds: Option[Long],
                             maxSubmissionsPerContestToSave: Option[Int]
                           ): Seq[SubmissionPreview] = {
-    logger.debug(s"Trimming ${previews.size} previews since ${sinceUnixSeconds} up to ${maxSubmissionsPerContestToSave}")
+    logger.debug(s"Trimming ${previews.size} previews since ${
+      sinceUnixSeconds.map(_.toString).getOrElse("ever")
+    } up to ${
+      maxSubmissionsPerContestToSave.map(_.toString).getOrElse("everything")
+    }")
     val solved = previews.filter(_.accepted)
 
     val dedupped = takeLatestByChallengeByLang(solved)
