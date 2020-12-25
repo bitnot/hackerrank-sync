@@ -1,7 +1,13 @@
+# IntelliJ IDEA
 .idea
 project/target
 target
 
-application.conf
+# VSCode
+.vscode
+.bloop
+metals.sbt
 
+# Local settings
+application.conf
 src/main/resources/cookies.txt
