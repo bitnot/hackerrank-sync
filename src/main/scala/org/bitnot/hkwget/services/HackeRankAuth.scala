@@ -2,17 +2,17 @@ package org.bitnot.hkwget.services
 
 import com.softwaremill.sttp.{Empty, RequestT}
 import com.typesafe.scalalogging.LazyLogging
-import org.bitnot.hkwget.services.HackeRankAuth.NewRequest
+import org.bitnot.hkwget.services.HackerRankAuth.NewRequest
 
 
-trait HackeRankAuth {
+trait HackerRankAuth {
   def setHeaders(req: NewRequest): NewRequest
 }
 
-object HackeRankAuth {
+object HackerRankAuth {
   type NewRequest = RequestT[Empty, String, Nothing]
 
-  implicit class Authorizer(req: NewRequest)(implicit auth: HackeRankAuth) {
+  implicit class Authorizer(req: NewRequest)(implicit auth: HackerRankAuth) {
     def authorize(): NewRequest = auth.setHeaders(req)
   }
 
@@ -20,9 +20,9 @@ object HackeRankAuth {
 
 /*
 // TODO: Figure out how auth actually works
-case class BasicHackeRankAuth(login: String, password: String)(
+case class BasicHackerRankAuth(login: String, password: String)(
   implicit backend: SttpBackend[Id, Nothing]
-) extends HackeRankAuth with LazyLogging {
+) extends HackerRankAuth with LazyLogging {
 
   def setHeaders(req: NewRequest): NewRequest = {
 
@@ -42,7 +42,7 @@ case class BasicHackeRankAuth(login: String, password: String)(
 }*/
 
 case class FullCookieAuth(cookie: String)
-  extends HackeRankAuth
+  extends HackerRankAuth
     with LazyLogging {
   def setHeaders(req: NewRequest): NewRequest = {
     val CookieHeader = "Cookie"
@@ -52,7 +52,7 @@ case class FullCookieAuth(cookie: String)
 }
 
 case class SessionCookieAuth(sessionCookieValue: String)
-  extends HackeRankAuth
+  extends HackerRankAuth
     with LazyLogging {
   def setHeaders(req: NewRequest): NewRequest = {
     val CookieHeader = "Cookie"

@@ -9,7 +9,7 @@ import org.scalatest.OneInstancePerTest
 import com.softwaremill.sttp.testing.SttpBackendStub
 
 import org.bitnot.hkwget.JsonStubs._
-import org.bitnot.hkwget.services.HackeRankAuth.NewRequest
+import org.bitnot.hkwget.services.HackerRankAuth.NewRequest
 
 
 class HackerRankHttpServiceSpec
@@ -39,7 +39,7 @@ class HackerRankHttpServiceSpec
       .whenRequestMatches(_.uri.path.startsWith(Seq("rest", "hackers", login)))
       .thenRespond(contestParticipations)
 
-  private implicit val auth = new HackeRankAuth {
+  private implicit val auth = new HackerRankAuth {
     override def setHeaders(req: NewRequest): NewRequest = req
   }
   private val service = new HackerRankHttpService(login)

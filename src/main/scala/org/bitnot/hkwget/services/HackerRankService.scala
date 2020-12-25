@@ -39,7 +39,7 @@ trait HackerRankService {
 class HackerRankHttpService(username: String,
                             contestBlackList: Set[String] = Set.empty)(
                              implicit
-                             auth: HackeRankAuth,
+                             auth: HackerRankAuth,
                              backend: SttpBackend[Id, Nothing] = HttpURLConnectionBackend())
   extends HackerRankService
     with LazyLogging {
@@ -148,10 +148,10 @@ class HackerRankHttpService(username: String,
 
 object HackerRankHttpService extends LazyLogging {
   def get[T](uri: Uri)(implicit
-                       auth: HackeRankAuth,
+                       auth: HackerRankAuth,
                        backend: SttpBackend[Id, Nothing],
                        decoder: io.circe.Decoder[T]): Try[T] = {
-    import HackeRankAuth._
+    import HackerRankAuth._
     logger.debug(s"getting $uri")
     val request = emptyRequest
       .header("User-Agent", "curl/7.67", true)
