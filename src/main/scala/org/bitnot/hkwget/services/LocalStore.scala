@@ -15,8 +15,9 @@ trait LocalStore {
 }
 
 class LocalFileStore(outputDir: String, overrideExisting: Boolean = false)
-    extends LocalStore
+  extends LocalStore
     with LazyLogging {
+
   import LocalFileStore._
 
   private final val tableHeader = "Track | Topic | Score | Challenge" +
@@ -61,7 +62,7 @@ class LocalFileStore(outputDir: String, overrideExisting: Boolean = false)
               track.parent_slug,
               track.slug,
               challenge.slug
-          ))
+            ))
         .getOrElse(
           Paths.get(
             challenge.slug
@@ -92,9 +93,9 @@ class LocalFileStore(outputDir: String, overrideExisting: Boolean = false)
       s"# ${contest.slug}\n\n$tableHeader\n${merged.mkString("\n")}"
 
     Files.write(contestIndexPath,
-                indexMd.getBytes(StandardCharsets.UTF_8),
-                StandardOpenOption.CREATE,
-                StandardOpenOption.TRUNCATE_EXISTING)
+      indexMd.getBytes(StandardCharsets.UTF_8),
+      StandardOpenOption.CREATE,
+      StandardOpenOption.TRUNCATE_EXISTING)
   }
 
   private def filePathInContestDir(contest: Contest, fileName: String) =
@@ -114,7 +115,7 @@ class LocalFileStore(outputDir: String, overrideExisting: Boolean = false)
             track.parent_slug,
             track.slug,
             challenge.slug
-        ))
+          ))
       .getOrElse(
         Paths.get(
           outputDir,
@@ -136,7 +137,7 @@ class LocalFileStore(outputDir: String, overrideExisting: Boolean = false)
             track.slug,
             challenge.slug,
             fileName
-        ))
+          ))
       .getOrElse(
         Paths.get(
           outputDir,
@@ -157,9 +158,9 @@ class LocalFileStore(outputDir: String, overrideExisting: Boolean = false)
     if (overrideExisting || !Files.exists(submissionPath)) {
       logger.debug(s"Writing submission: $submissionPath")
       Files.write(submissionPath,
-                  submission.sourceCode.getBytes(StandardCharsets.UTF_8),
-                  StandardOpenOption.CREATE,
-                  StandardOpenOption.TRUNCATE_EXISTING)
+        submission.sourceCode.getBytes(StandardCharsets.UTF_8),
+        StandardOpenOption.CREATE,
+        StandardOpenOption.TRUNCATE_EXISTING)
     } else logger.debug(s"File exists: $submissionPath")
   }
 
@@ -215,7 +216,12 @@ object LocalFileStore extends LazyLogging {
         var fileOutputStream: FileOutputStream = null
         try {
           Files.createFile(toFilePath)
-          rbcObj = Channels.newChannel(fromUrl.toURL.openStream)
+
+          val url = fromUrl.toURL
+          val httpConn = url.openConnection
+          httpConn.addRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:56.0) Gecko/20100101 Firefox/56.0")
+
+          rbcObj = Channels.newChannel(httpConn.getInputStream)
           fileOutputStream = new FileOutputStream(toFilePath.toString)
           fileOutputStream.getChannel.transferFrom(rbcObj, 0, Long.MaxValue)
           logger.debug(s"File $toFilePath downloaded from $fromUrl")
