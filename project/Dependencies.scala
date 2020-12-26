@@ -32,10 +32,10 @@ object Dependencies {
     val logback = "1.2.3"
     val resilience4j = "1.6.1"
     val scalaLogging = "3.9.2"
-    val scalamock = "5.0.0"
-    val scalatest = "3.2.1"
+    val scalamock = "5.1.0"
+    val scalatest = "3.2.3"
     val sttp = "2.2.9"
-    val typesafeConfig = "1.4.0"
+    val typesafeConfig = "1.4.1"
   }
 
 }
