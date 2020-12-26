@@ -1,4 +1,5 @@
 import Dependencies._
+import cats.instances.map
 
 name := "hkwget"
 organization := "org.bitnot"
@@ -13,9 +14,9 @@ resolvers ++= Seq(
   Resolver.sonatypeRepo("snapshots")
 )
 
-libraryDependencies ++= circe
-libraryDependencies ++= commonDeps
- libraryDependencies ++= resilience4j
-libraryDependencies ++= sttp
+libraryDependencies ++= circe.map(_.withDottyCompat(scalaVersion.value))
+libraryDependencies ++= commonDeps.map(_.withDottyCompat(scalaVersion.value))
+libraryDependencies ++= resilience4j.map(_.withDottyCompat(scalaVersion.value))
+libraryDependencies ++= sttp.map(_.withDottyCompat(scalaVersion.value))
 
-libraryDependencies ++= Seq(scalaTest, scalaMock) map (_ % Test)
+libraryDependencies ++= Seq(scalaTest, scalaMock) map (_ % Test) map (_.withDottyCompat(scalaVersion.value))
