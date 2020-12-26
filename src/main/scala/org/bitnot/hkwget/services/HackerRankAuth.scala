@@ -1,6 +1,6 @@
 package org.bitnot.hkwget.services
 
-import com.typesafe.scalalogging.LazyLogging
+import org.bitnot.hkwget.helpers.LazyLogging
 import org.bitnot.hkwget.services.HackerRankAuth._
 import sttp.client.{Empty, RequestT}
 

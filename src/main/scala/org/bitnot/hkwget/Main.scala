@@ -2,7 +2,7 @@ package org.bitnot.hkwget
 
 import sttp.client.{HttpURLConnectionBackend, Identity, NothingT, SttpBackend}
 import com.typesafe.config.ConfigFactory
-import com.typesafe.scalalogging.LazyLogging
+import org.bitnot.hkwget.helpers.LazyLogging
 import io.github.resilience4j.ratelimiter.{RateLimiter, RateLimiterConfig}
 import org.bitnot.hkwget.helpers.RateLimitingSttpBackend
 import org.bitnot.hkwget.models.Profile
