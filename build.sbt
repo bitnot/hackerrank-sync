@@ -9,8 +9,10 @@ scalaVersion := "3.0.0-M3"
 
 scalacOptions ++= {
   if (isDotty.value) Seq(
-    "-source:3.0-migration",
-    "-rewrite")
+    "-Xfatal-warnings",
+    "-deprecation",
+    "-feature",
+    "-unchecked")
   else Seq.empty
 }
 
