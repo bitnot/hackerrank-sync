@@ -166,7 +166,6 @@ object HackerRankHttpService extends LazyLogging {
 
     //    logger.debug(s"Request:\n${request.toCurl}")
     val response: Identity[Response[Either[ResponseError[circe.Error], T]]] = request.send()
-    val body: Either[ResponseError[circe.Error], T] = response.body
     response.body match {
       case Right(t) =>
         logger.debug(s"success: ${t.getClass}")

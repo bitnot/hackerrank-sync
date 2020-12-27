@@ -30,14 +30,9 @@ libraryDependencies ++= logging
 libraryDependencies ++= resilience4j
 libraryDependencies ++= sttp
   .map(_.withDottyCompat(scalaVersion.value))
-  .map(_
-    .exclude("io.circe", "circe-core_2.13")
-    .exclude("io.circe", "circe-jawn_2.13")
-    .exclude("io.circe", "circe-numbers_2.13")
-    .exclude("io.circe", "circe-parser_2.13")
-    .exclude("org.typelevel", "cats-core_2.13")
-    .exclude("org.typelevel", "cats-kernel_2.13")
-    .exclude("org.typelevel", "jawn-parser_2.13")
+  .map(_.excludeAll(
+    ExclusionRule(organization = "io.circe"),
+    ExclusionRule(organization = "org.typelevel"))
   )
 
 libraryDependencies ++= Seq(scalaTest) map (_ % Test)
