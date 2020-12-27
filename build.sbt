@@ -1,5 +1,4 @@
 import Dependencies._
-import cats.instances.map
 
 name := "hkwget"
 organization := "org.bitnot"
@@ -39,5 +38,4 @@ libraryDependencies ++= sttp
     .exclude("org.typelevel", "jawn-parser_2.13")
   )
 
-// TODO #2
-libraryDependencies ++= Seq(scalaTest, scalaMock) map (_ % Test) map (_.withDottyCompat(scalaVersion.value))
+libraryDependencies ++= Seq(scalaTest) map (_ % Test)

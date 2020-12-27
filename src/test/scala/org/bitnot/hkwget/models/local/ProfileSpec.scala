@@ -5,10 +5,9 @@ import io.circe.parser._
 import org.bitnot.hkwget.JsonStubs
 import org.bitnot.hkwget.models.Profile
 import org.bitnot.hkwget.models.hackerrank.{ApiResponse, SubmissionPreview, SubmissionResponse}
-import org.scalamock.scalatest.MockFactory
+import org.scalatest.OneInstancePerTest
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-import org.scalatest.OneInstancePerTest
 
 import scala.language.postfixOps
 
@@ -16,8 +15,7 @@ import scala.language.postfixOps
 class ProfileSpec
   extends AnyFlatSpec
     with Matchers
-    with OneInstancePerTest
-    with MockFactory {
+    with OneInstancePerTest {
   behavior of "Profile"
 
   lazy val single = decode[SubmissionResponse](JsonStubs.singleSubmission)
