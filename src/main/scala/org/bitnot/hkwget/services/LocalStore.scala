@@ -4,14 +4,14 @@ import java.net.URI
 import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Paths, StandardOpenOption}
 
-import com.typesafe.scalalogging.LazyLogging
+import org.bitnot.hkwget.helpers.LazyLogging
 import org.bitnot.hkwget.helpers.Urls
 import org.bitnot.hkwget.models.{Challenge, Contest, Profile, local}
 
 import scala.collection.JavaConverters._
 
 trait LocalStore {
-  def save(profile: Profile)
+  def save(profile: Profile): Unit 
 }
 
 class LocalFileStore(outputDir: String, overrideExisting: Boolean = false)
@@ -34,7 +34,7 @@ class LocalFileStore(outputDir: String, overrideExisting: Boolean = false)
     UpdateIndex(contest)
   }
 
-  private def saveChallengeFiles(challenge: Challenge, contest: Contest) {
+  private def saveChallengeFiles(challenge: Challenge, contest: Contest): Unit = {
     val challengePath = challengeDirPath(contest, challenge)
 
     createDir(challengePath)

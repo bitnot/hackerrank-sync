@@ -3,7 +3,7 @@ package org.bitnot.hkwget.services
 import java.time.Duration
 import sttp.client._
 import sttp.client.circe._
-import com.typesafe.scalalogging.LazyLogging
+import org.bitnot.hkwget.helpers.LazyLogging
 import io.circe
 import io.circe.generic.auto._
 import org.bitnot.hkwget.helpers.CustomDecoders._
@@ -63,7 +63,7 @@ class HackerRankHttpService(username: String,
       trimPreviews(previews, sinceUnixSeconds, maxSubmissionsPerContestToSave)
 
 
-    val contestNames = "master" :: getContestParticipations.map { participation =>
+    val contestNames = "master" :: getContestParticipations().map { participation =>
       participation.models.collect {
         case x if x.hacker_rank.isDefined => x.slug
       }.toList
@@ -166,7 +166,6 @@ object HackerRankHttpService extends LazyLogging {
 
     //    logger.debug(s"Request:\n${request.toCurl}")
     val response: Identity[Response[Either[ResponseError[circe.Error], T]]] = request.send()
-    val body: Either[ResponseError[circe.Error], T] = response.body
     response.body match {
       case Right(t) =>
         logger.debug(s"success: ${t.getClass}")
