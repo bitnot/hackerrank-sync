@@ -4,7 +4,7 @@ name := "hkwget"
 organization := "org.bitnot"
 version := "0.0.2"
 
-scalaVersion := "3.0.0-M3"
+scalaVersion := "3.1.3"
 //crossScalaVersions ++= Seq("2.13.4", "3.0.0-M3")
 
 scalacOptions ++= {

@@ -1,2 +1,2 @@
 // https://scalacenter.github.io/scala-3-migration-guide/docs/tutorials/sbt-migration.html
-addSbtPlugin("ch.epfl.lamp" % "sbt-dotty" % "0.5.1")
+addSbtPlugin("ch.epfl.lamp" % "sbt-dotty" % "0.5.5")
