@@ -6,9 +6,11 @@ target
 # VSCode
 .vscode
 .bloop
+.metals
 metals.sbt
 
 # Local settings
 application.conf
 src/main/resources/cookies.txt
 /.bsp/
+core.*
